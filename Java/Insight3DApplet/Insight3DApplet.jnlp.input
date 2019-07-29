@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="6.0+" codebase="" href="">
+	<information>
+		<title>Insight3DApplet</title>
+		<vendor>Analytical Graphics, Inc.</vendor>
+	</information>
+
+	<resources arch="amd64">
+		<j2se version="1.8+" href="http://java.sun.com/products/autodl/j2se" />
+		<nativelib href="agi.foundation.graphics.native.x64.jar" download="eager" />
+	</resources>
+
+	<resources>
+		<jar href="Insight3DApplet.jar" main="true" />
+
+		<extension name="STK Components" href="STKComponents.jnlp" />
+	</resources>
+
+	<security>
+		<all-permissions />
+	</security>
+
+	<applet-desc name="InsightApplet" main-class="com.agi.InsightApplet" width="300" height="300" />
+
+	<update check="always" />
+</jnlp>

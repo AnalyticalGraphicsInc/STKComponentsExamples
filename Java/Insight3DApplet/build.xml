@@ -1,0 +1,112 @@
+<project name="Insight3DApplet" basedir="." default="package">
+	<property name="jar.name" value="Insight3DApplet.jar" />
+
+	<property name="output.dir" value="ant" />
+	<property name="bin.dir" value="${output.dir}/bin" />
+	<property name="native.bin.dir" value="${output.dir}/native" />
+	<property name="site.dir" value="site" />
+	<property name="jars.dir" value="../../Jars" />
+
+	<target name="clean" description="Clean all generated output.">
+		<delete dir="${output.dir}" />
+		<delete dir="${site.dir}" />
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${native.bin.dir}" />
+		<mkdir dir="${site.dir}" />
+		<path id="project.classpath">
+			<fileset dir="${jars.dir}">
+				<include name="agi.foundation.core-*.jar" />
+				<include name="agi.foundation.models-*.jar" />
+				<include name="agi.foundation.platforms-*.jar" />
+				<include name="agi.foundation.platforms.graphics-*.jar" />
+				<include name="agi.foundation.graphics-*.jar" />
+				<include name="agi.foundation.terrainreaders-*.jar" />
+			</fileset>
+		</path>
+	</target>
+
+	<target name="compile" depends="prepare" description="Compile source code.">
+		<fail message="License not present. Copy your STK Components license file, AGI.Foundation.lic, into the src folder.">
+			<condition>
+				<not>
+					<available file="src/AGI.Foundation.lic" />
+				</not>
+			</condition>
+		</fail>
+
+		<javac source="1.8" target="1.8" destdir="${bin.dir}" classpathref="project.classpath" includeantruntime="no">
+			<src path="src" />
+		</javac>
+	</target>
+
+	<target name="package" depends="compile" description="Package the applet into a jar, and copy all needed resources for deployment to the site directory.">
+		<!-- Build the jar file containing the applet itself -->
+		<copy todir="${bin.dir}">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+
+		<jar destfile="${site.dir}/${jar.name}">
+			<fileset dir="${bin.dir}" />
+			<manifest>
+				<attribute name="Caller-Allowable-Codebase" value="*" />
+			</manifest>
+		</jar>
+
+		<!-- Copy native DLLs, flattening directory structure -->
+		<copy todir="${native.bin.dir}" flatten="true">
+			<fileset dir="${jars.dir}">
+				<include name="**/*.dll" />
+			</fileset>
+		</copy>
+
+		<!-- Build the native resource jar containing the necessary DLLs -->
+		<jar destfile="${site.dir}/agi.foundation.graphics.native.x64.jar" basedir="${native.bin.dir}" />
+
+		<!-- Sign the jars we created in the site directory -->
+		<signjar keystore="keystore" storepass="keystore" alias="cert" lazy="true">
+			<path>
+				<fileset dir="${site.dir}">
+					<include name="${jar.name}" />
+					<include name="agi.foundation.graphics.native.x64.jar" />
+				</fileset>
+			</path>
+		</signjar>
+
+		<!-- Copy library jars to the site directory -->
+		<copy todir="${site.dir}" flatten="true">
+			<path refid="project.classpath" />
+		</copy>
+
+		<!-- Build the resource tags for the library jars to be written into the JNLP file -->
+		<pathconvert property="jnlp.lib.jar.files" pathsep="${line.separator}">
+			<path refid="project.classpath" />
+			<chainedmapper>
+				<flattenmapper />
+				<regexpmapper from="(.*)" to="&lt;jar href=&quot;\1&quot; download=&quot;eager&quot; /&gt;" />
+			</chainedmapper>
+		</pathconvert>
+
+		<!-- 
+			Copy the JNLP template files to the site directory, replacing the 
+			@LIBARY_RESOURCES@ tag with the set of jar files 
+		-->
+		<copy todir="${site.dir}">
+			<fileset dir=".">
+				<include name="*.jnlp.input" />
+			</fileset>
+			<globmapper from="*.jnlp.input" to="*.jnlp" />
+			<filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.ReplaceTokens">
+					<param type="token" name="LIBRARY_RESOURCES" value="${jnlp.lib.jar.files}" />
+				</filterreader>
+			</filterchain>
+		</copy>
+
+		<!-- Copy the HTML file to the site directory -->
+		<copy file="Insight3DApplet.html" todir="${site.dir}" />
+		<copy file="web.config" todir="${site.dir}" />
+	</target>
+</project>
