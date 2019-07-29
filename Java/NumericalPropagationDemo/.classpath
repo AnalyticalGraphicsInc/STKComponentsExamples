@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<classpath>
+  <classpathentry kind="src" path="src" />
+  <classpathentry including="EOP-v1.1.txt|LeapSecond.dat|SatelliteDatabase/stkSatDb*|Textures/OverlayToolbar/|plneph.430" kind="src" output="Data" path="commonData" />
+  <classpathentry including="agi/examples/EarthOrientationParametersHelper.java|agi/examples/LeapSecondsFacetHelper.java|agi/examples/OverlayToolbar.java" kind="src" path="commonSrc" />
+  <classpathentry kind="src" output="Data" path="projectData" />
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8" />
+  <classpathentry kind="lib" path="lib/forms-1.3.0.jar" />
+  <classpathentry kind="lib" path="jars/agi.foundation.core-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.graphics-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="NumericalPropagationDemo/jars" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.models-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.orbitpropagation-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.platforms-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.platforms.graphics-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.terrainreaders-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/NumericalPropagationDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="output" path="bin" />
+</classpath>
