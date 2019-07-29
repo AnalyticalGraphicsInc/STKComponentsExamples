@@ -26,6 +26,11 @@ You must create an AGI account in order to download STK Components. After loggin
 
 STK Components requires a license. Temporary licenses for development and evaluation can be requested from AGI Support by emailing [support@agi.com](support@agi.com).
 
+## License
+
+The example applications in this repository are licensed under the STK Components Developer Resources License Agreement, which is included in this repository as [License.pdf](License.pdf).
+
 ## What if I have questions about using STK Components?
 
 Contact [support@agi.com](support@agi.com) with any questions about STK Components or other AGI products.
+
