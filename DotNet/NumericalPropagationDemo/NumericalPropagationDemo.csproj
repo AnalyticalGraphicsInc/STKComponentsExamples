@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C9229FE6-AA6A-4E54-BEBE-C5900F7AB828}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NumericalPropagationDemo</RootNamespace>
+    <AssemblyName>NumericalPropagationDemo</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>
+    </NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AGI.Foundation.Core">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Graphics">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Models">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.OrbitPropagation">
+      <HintPath>..\..\Assemblies\AGI.Foundation.OrbitPropagation.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Platforms">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Platforms.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Platforms.Graphics">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Platforms.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Common\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\EarthOrientationParametersHelper.cs">
+      <Link>EarthOrientationParametersHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\Insight3DHelper.cs">
+      <Link>Insight3DHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\LeapSecondsFacetHelper.cs">
+      <Link>LeapSecondsFacetHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\OverlayToolbar.cs">
+      <Link>OverlayToolbar.cs</Link>
+    </Compile>
+    <Compile Include="ForceModelSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ForceModelSettings.Designer.cs">
+      <DependentUpon>ForceModelSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Designer.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IntegratorSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IntegratorSettings.Designer.cs">
+      <DependentUpon>IntegratorSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="KeplerianOrbitalElementsEntry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="KeplerianOrbitalElementsEntry.Designer.cs">
+      <DependentUpon>KeplerianOrbitalElementsEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ForceModelSettings.resx">
+      <DependentUpon>ForceModelSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IntegratorSettings.resx">
+      <DependentUpon>IntegratorSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KeplerianOrbitalElementsEntry.resx">
+      <DependentUpon>KeplerianOrbitalElementsEntry.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="Main.resx">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="..\Common\Data\LeapSecond.dat">
+      <Link>Data\LeapSecond.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\plneph.430">
+      <Link>Data\plneph.430</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="app.config" />
+    <None Include="Data\EarthGravityFile_EGM2008.grv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\LunarGravityField_LP100K.grv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Common\Data\EOP-v1.1.txt">
+      <Link>Data\EOP-v1.1.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\decreasedelta.png">
+      <Link>Data\Textures\OverlayToolbar\decreasedelta.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\home.png">
+      <Link>Data\Textures\OverlayToolbar\home.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\increasedelta.png">
+      <Link>Data\Textures\OverlayToolbar\increasedelta.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\invisible.png">
+      <Link>Data\Textures\OverlayToolbar\invisible.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\moon.png">
+      <Link>Data\Textures\OverlayToolbar\moon.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\pan.png">
+      <Link>Data\Textures\OverlayToolbar\pan.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\panpressed.png">
+      <Link>Data\Textures\OverlayToolbar\panpressed.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\pause.png">
+      <Link>Data\Textures\OverlayToolbar\pause.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\playforward.png">
+      <Link>Data\Textures\OverlayToolbar\playforward.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\playreverse.png">
+      <Link>Data\Textures\OverlayToolbar\playreverse.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\reset.png">
+      <Link>Data\Textures\OverlayToolbar\reset.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\rotate.png">
+      <Link>Data\Textures\OverlayToolbar\rotate.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\scale.png">
+      <Link>Data\Textures\OverlayToolbar\scale.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\stepforward.png">
+      <Link>Data\Textures\OverlayToolbar\stepforward.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\stepreverse.png">
+      <Link>Data\Textures\OverlayToolbar\stepreverse.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\visible.png">
+      <Link>Data\Textures\OverlayToolbar\visible.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\zoom.png">
+      <Link>Data\Textures\OverlayToolbar\zoom.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\zoompressed.png">
+      <Link>Data\Textures\OverlayToolbar\zoompressed.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Markers\Satellite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
