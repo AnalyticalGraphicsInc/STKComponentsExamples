@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1A19A1DC-E00A-4CC3-9680-C5A85E8D4146}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AGI.Examples.LotsOfSatellites</RootNamespace>
+    <AssemblyName>LotsOfSatellites</AssemblyName>
+    <ApplicationIcon>LotsOfSatellites.ico</ApplicationIcon>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AGI.Foundation.Core">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Graphics">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Models">
+      <HintPath>..\..\Assemblies\AGI.Foundation.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Common\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\EarthOrientationParametersHelper.cs">
+      <Link>EarthOrientationParametersHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\Insight3DHelper.cs">
+      <Link>Insight3DHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\LeapSecondsFacetHelper.cs">
+      <Link>LeapSecondsFacetHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Common\OverlayToolbar.cs">
+      <Link>OverlayToolbar.cs</Link>
+    </Compile>
+    <Compile Include="LotsOfSatellites.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LotsOfSatellites.Designer.cs">
+      <DependentUpon>LotsOfSatellites.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="LotsOfSatellites.resx">
+      <DependentUpon>LotsOfSatellites.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="..\Common\Data\plneph.430">
+      <Link>Data\plneph.430</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\LeapSecond.dat">
+      <Link>Data\LeapSecond.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.fr">
+      <Link>Data\SatelliteDatabase\stkAllTLE.fr</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.gd">
+      <Link>Data\SatelliteDatabase\stkAllTLE.gd</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.om">
+      <Link>Data\SatelliteDatabase\stkAllTLE.om</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.sd">
+      <Link>Data\SatelliteDatabase\stkAllTLE.sd</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.tce">
+      <Link>Data\SatelliteDatabase\stkAllTLE.tce</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkAllTLE.wr">
+      <Link>Data\SatelliteDatabase\stkAllTLE.wr</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.fr">
+      <Link>Data\SatelliteDatabase\stkSatDb.fr</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.gd">
+      <Link>Data\SatelliteDatabase\stkSatDb.gd</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.om">
+      <Link>Data\SatelliteDatabase\stkSatDb.om</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.sd">
+      <Link>Data\SatelliteDatabase\stkSatDb.sd</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.tce">
+      <Link>Data\SatelliteDatabase\stkSatDb.tce</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Common\Data\SatelliteDatabase\stkSatDb.wr">
+      <Link>Data\SatelliteDatabase\stkSatDb.wr</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="app.config" />
+    <Compile Include="Satellites.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Common\Data\EOP-v1.1.txt">
+      <Link>Data\EOP-v1.1.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\decreasedelta.png">
+      <Link>Data\Textures\OverlayToolbar\decreasedelta.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\home.png">
+      <Link>Data\Textures\OverlayToolbar\home.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\increasedelta.png">
+      <Link>Data\Textures\OverlayToolbar\increasedelta.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\invisible.png">
+      <Link>Data\Textures\OverlayToolbar\invisible.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\moon.png">
+      <Link>Data\Textures\OverlayToolbar\moon.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\pan.png">
+      <Link>Data\Textures\OverlayToolbar\pan.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\panpressed.png">
+      <Link>Data\Textures\OverlayToolbar\panpressed.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\pause.png">
+      <Link>Data\Textures\OverlayToolbar\pause.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\playforward.png">
+      <Link>Data\Textures\OverlayToolbar\playforward.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\playreverse.png">
+      <Link>Data\Textures\OverlayToolbar\playreverse.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\reset.png">
+      <Link>Data\Textures\OverlayToolbar\reset.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\rotate.png">
+      <Link>Data\Textures\OverlayToolbar\rotate.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\scale.png">
+      <Link>Data\Textures\OverlayToolbar\scale.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\stepforward.png">
+      <Link>Data\Textures\OverlayToolbar\stepforward.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\stepreverse.png">
+      <Link>Data\Textures\OverlayToolbar\stepreverse.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\visible.png">
+      <Link>Data\Textures\OverlayToolbar\visible.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\zoom.png">
+      <Link>Data\Textures\OverlayToolbar\zoom.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Common\Data\Textures\OverlayToolbar\zoompressed.png">
+      <Link>Data\Textures\OverlayToolbar\zoompressed.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Markers\Facility.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Markers\Satellite-Red.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Markers\Satellite.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Textures\OverlayToolbar\fewsatellites.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Textures\OverlayToolbar\manysatellites.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Textures\OverlayToolbar\noshowaccess.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Textures\OverlayToolbar\showaccess.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LotsOfSatellites.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
