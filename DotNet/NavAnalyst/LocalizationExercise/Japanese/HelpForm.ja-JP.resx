@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>NavAnalystのヘルプ
+
+NavAnalystは、DOP値と精度のグラフ表示と、天体暦をAGI標準エフェメリスファイル“.e”にエクスポートすることができます。
+
+DOPと精度をグラフ化するには、
+
+１）	Almanacタブ上であなたが解析したい時間に当てはまるようにSEM暦を選択します。2007年6月21日の天体暦はこのアプリケーションに含まれています。それ以外のalmanac file　は、ftp://ftp.agi.com/pub/Catalog/Almanacsで見つかります。
+２）	解析の開始と終了時刻をセットし、世界標準時かGPS時間かを指定します。
+３）	解析の時間ステップをセットします。DOP値は各々の時間ステップで計算されます。
+４）	“受信機”タブをクリックし、位置や状況など適用する受信機のパラメータをセットします。
+５）	“受信機の追加”ボタンをクリックします。
+
+これで左上のウィンドウのツリーに受信機のパラメータが表示されます。NavAnalystは上のステップ2で定義した時間に対してDOP値を計算し、右ウィンドウ内のグラフにプロットします。
+
+６）精度のグラフ化は、“精度”タブ上でPAFファイルかPSFファイルのどちらかを選択します。選択後、精度グラフが表示されます。
+
+プロットの表示・非表示をDOPグラフ上で選択できます。各々のDOP値のポインタはDOP値に適用される衛星の数PRNと、時間とDOP値自身を表示する。グラフ上で右クリックすると、ズームやグラフのプリントアウトなどのメニューが表示されます。
+
+仰角のプロットは時間か方位の関数として衛星の仰角を表示します。グラフ下のラジオボタンでX軸を切り替えられます。各々の仰角のポインタはPRN,時間、方位と仰角を表示します。
+
+精度グラフは評価精度と予測精度の双方を含みます。全ての時間に対して評価精度を外挿する場合、“外挿する”チェックボックスをチェックします。そうしなければ、有効なPAF時間間隔内にある選択した開始時間と終了時間についてのみプロットされます。予測精度は特定の信頼区間に合わされます。新しい信頼区間にセットするには、0～100の間で値を選び、PSFファイルをロードあるいは、リロードします。
+
+受信機の特長を変更するには、“Delete Receiver”ボタンをクリックし、パラメータを変更して“Add Receiver”をクリックする。
+
+選択された暦によって作成されたエフェメリスをAGI標準エフェメリスファイル“.e”にエクスポートするには
+
+１）	Almanacタブで、解析した時間に当てはまるSEM暦を閲覧する
+２）	解析の開始と終了時刻をセットし、世界標準時かGPS時間かを指定します。
+３）	解析の時間ステップをセットします。エフェメリス値は各々の時間ステップで計算されます。
+４）	“Export to .e files”ボタンをクリック
+
+ユーザが指定した解析期間と時間ステップを用いて、各衛星の.eファイルが作成されます。ファイルは天文暦almanacが選択されたフォルダに作成されます。</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>NavAnalystのヘルプ</value>
+  </data>
+</root>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>NavAnalyst permette di tracciare un diagramma dei valori di Dilution of Precision e di accuratezza per un determinato ricevitore e di esportare un almanacco delle effemeridi nei file AGI-standard delle effemeridi di tipo ‘.e’.
+
+Per creare tracciati DOP o di accuratezza:
+1) Utilizzando l’etichetta “Almanacco”, individuare una almanacco SEM valido per il tempo che si intende analizzare. Un almanacco per il giorno 21 Giugno 2007 è già fornito con l’applicazione. Ulteriori almanacchi possono essere reperiti utilizzando il seguente URL: ftp://ftp.agi.com/pub/Catalog/Almanacs
+2) Impostare il tempo di inizio e quello di fine intervallo di analisi e specificare se questi tempi sono in UTC time o GPS time. 
+3) Impostare l’intervallo temporale (time step) per l’analisi. I valori di DOP verranno calcolati per ogni time step
+4) Selezionare l’etichetta “Ricevitore” ed impostare i parametri del ricevitore relativi alla situazione in esame includendo anche la locazione. 
+5) Selezionare il tasto “Aggiungi Ricevitore”.
+
+A questo punto i parametri del ricevitore saranno evidenziati in un elenco ad albero a partire dall’angolo in alto a sinistra della finestra. NavAnalyst calcola anche i valori di DOP per gli intervalli temporali definiti nel passo 2 tracciandoli nel diagramma DOP sulla destra. 
+
+6) Per creare un grafico dell’accuratezza, utilizzare l’etichetta accuracy e selezionare un file PAF o un file PSF. Il completamente di tale selezione consentirà la tracciatura dei dati relativi all’accuratezza. 
+
+Nel grafico DOP è possibile selezionare e deselezionare i valori che si intende evidenziare nella stampa del tracciato. E’ utile notare che il testo del tooltip relativo ad ogni DOP, indica il PRN dei satelliti utilizzati nel calcolo del valore del DOP, fornendo i valori relativi di tempo e DOP. Selezionando il tasto destro del mouse nel grafico, sarà possibile, fra l’altro, effettuare operazioni di zoom in e zoom out e stampare il grafico. 
+
+Il tracciato degli angoli di elevazione riporta gli angoli di elevazione del satellite in funzione del tempo o dell’azimut. Selezionare il radio button nella parte bassa del grafico per cambiare fra le due modalità offerte per l’asse X. E’ utile notare che il testo del tooltip per ogni angolo di elevazione fornisce il PRN, il tempo, l’azimut e gli angoli di elevazione.
+
+
+
+
+
+Il grafico di accuratezza contiene i dati relativi di accuratezza stimati e previsti Per estrapolare i dati di accuratezza stimati ad uno specifico istante, selezionare il checkbox “Use Extrapolation”. In caso contrario, i dati saranno tracciati solo se il tempo di inizio e di fine selezionati sono compresi nell’intervallo di validità temporale del PAF. L’accuratezza prevista può essere proporzionata ad uno specifico intervallo di confidenza. Per impostare un nuovo intervallo di confidenza, selezionare un valore tra 0 e 100 e caricare (o ricaricare) il file PSF.      
+
+
+Per modificare le caratteristiche del ricevitore, selezionare il tasto “Eliminare Ricevitore”, modificare i parametri e selezionare il tasto “Aggiungere ricevitore”
+
+Per esportare le effemeridi generate dall’almanacco selezionato nei file AGI-standard  delle effemeridi di tipo ‘.e’ 
+
+1) Utilizzando l’etichetta Almanac, scegliere fra gli almanacchi SEM quello valido per il tempo che si intende analizzare.
+2) Impostare i tempi di inizio e fine dell’intervallo di analisi e specificare se i suddetti tempi sono in UTC o GPS time
+3) Impostare il time step per effettuare l’analisi. I valori delle effemeridi saranno calcolati sulla base del time step.
+4) Selezionare il tasto “Esportare nei file .e”
+
+Un nuovo file di tipo .e sarà scritto per ogni satellite nell’almanacco, utilizzando l’intervallo di tempo ed il time step specificati dall’utente. I file saranno scritti  nella cartella da cui è stato scelto l’almanacco.
+</value>
+  </data>
+</root>
