@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<classpath>
+  <classpathentry kind="src" path="src" />
+  <classpathentry excluding="*" including="Data/LeapSecond.dat|Data/SatelliteDatabase/stkSatDb*|Data/Terrain/StHelens.pdtt" kind="src" path="common" />
+  <classpathentry including="agi/examples/LeapSecondsFacetHelper.java|agi/examples/TwoLineElementSetHelper.java" kind="src" path="commonSrc" />
+  <classpathentry kind="src" path="web" />
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8" />
+  <classpathentry kind="lib" path="jars/agi.foundation.core-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.models-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.platforms-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.cesium-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="lib/spark-core-2.9.0.jar" sourcepath="lib/src/spark-core-2.9.0-sources.jar" />
+  <classpathentry kind="lib" path="lib/javax.servlet-api-3.1.0.jar" sourcepath="lib/src/javax.servlet-api-3.1.0-sources.jar" />
+  <classpathentry kind="lib" path="jars/agi.foundation.terrainanalysis-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="jars/agi.foundation.terrainreaders-2019r3.jar">
+    <attributes>
+      <attribute name="javadoc_location" value="jar:platform:/resource/CesiumDemo/doc/agi.foundation.javadoc-2019r3.zip!/" />
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="lib/slf4j-api-1.7.25.jar" sourcepath="lib/src/slf4j-api-1.7.25-sources.jar" />
+  <classpathentry kind="lib" path="lib/jetty-server-9.4.15.v20190215.jar" sourcepath="lib/src/jetty-server-9.4.15.v20190215-sources.jar" />
+  <classpathentry kind="lib" path="lib/jetty-util-9.4.15.v20190215.jar" sourcepath="lib/src/jetty-util-9.4.15.v20190215-sources.jar" />
+  <classpathentry kind="lib" path="lib/jetty-http-9.4.15.v20190215.jar" sourcepath="lib/src/jetty-http-9.4.15.v20190215-sources.jar" />
+  <classpathentry kind="lib" path="lib/jetty-io-9.4.15.v20190215.jar" sourcepath="lib/src/jetty-io-9.4.15.v20190215-sources.jar" />
+  <classpathentry kind="lib" path="lib/slf4j-simple-1.7.25.jar" sourcepath="lib/src/slf4j-simple-1.7.25-sources.jar" />
+  <classpathentry kind="output" path="bin" />
+</classpath>

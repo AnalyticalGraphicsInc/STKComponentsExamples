@@ -1,0 +1,85 @@
+<project name="CesiumDemo" basedir="." default="package">
+	<property name="jar.name" value="CesiumDemo.jar" />
+
+	<property name="output.dir" value="ant" />
+	<property name="bin.dir" value="${output.dir}/bin" />
+	<property name="dist.dir" value="dist" />
+	<property name="jars.dir" value="../../Jars" />
+
+	<target name="clean" description="Clean all generated output.">
+		<delete dir="${output.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${bin.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<path id="project.classpath">
+			<fileset dir="${jars.dir}">
+				<include name="agi.foundation.core-*.jar" />
+				<include name="agi.foundation.models-*.jar" />
+				<include name="agi.foundation.platforms-*.jar" />
+				<include name="agi.foundation.cesium-*.jar" />
+				<include name="agi.foundation.terrainanalysis-*.jar" />
+				<include name="agi.foundation.terrainreaders-*.jar" />
+			</fileset>
+			<fileset dir="lib" includes="*.jar" />
+		</path>
+	</target>
+
+	<target name="compile" depends="prepare" description="Compile source code.">
+		<fail message="License not present. Copy your STK Components license file, AGI.Foundation.lic, into the src folder.">
+			<condition>
+				<not>
+					<available file="src/AGI.Foundation.lic" />
+				</not>
+			</condition>
+		</fail>
+
+		<javac source="1.8" target="1.8" destdir="${bin.dir}" classpathref="project.classpath" includeantruntime="no">
+			<src path="src" />
+			<src path="../Common/src/" />
+			<include name="agi/examples/cesium/**" />
+		</javac>
+
+		<copy todir="${bin.dir}/Data">
+			<fileset dir="../Common/Data">
+				<include name="LeapSecond.dat" />
+				<include name="SatelliteDatabase/stkSatDb*" />
+				<include name="Terrain/StHelens.pdtt" />
+			</fileset>
+		</copy>
+		<copy todir="${bin.dir}">
+			<fileset dir="web" />
+		</copy>
+	</target>
+
+	<target name="package" depends="compile" description="Package the application into a jar, and copy all needed resources to the dist directory.">
+		<!-- Copy library jars to the dist directory -->
+		<copy todir="${dist.dir}" flatten="true">
+			<path refid="project.classpath" />
+		</copy>
+
+		<!-- Build the jar file containing the application itself -->
+		<copy todir="${bin.dir}">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+
+		<pathconvert property="manifest.classpath" pathsep=" ">
+			<path refid="project.classpath" />
+			<flattenmapper />
+		</pathconvert>
+
+		<jar destfile="${dist.dir}/${jar.name}">
+			<fileset dir="${bin.dir}" />
+			<manifest>
+				<attribute name="Class-Path" value="${manifest.classpath}" />
+				<attribute name="Main-Class" value="agi.examples.cesium.Application" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="run" depends="package" description="Build and run the demo application.">
+		<java fork="true" jar="${dist.dir}/${jar.name}" dir="${dist.dir}" />
+	</target>
+</project>
