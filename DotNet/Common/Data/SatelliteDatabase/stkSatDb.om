@@ -1,0 +1,110 @@
+BEGIN Owner
+AB
+ABS
+AC
+ALG
+ARGN
+ASRA
+AUS
+AZER
+BEL
+BELA
+BOL
+BRAZ
+CA
+CHBZ
+CHLE
+CIS
+COL
+CZCH
+DEN
+ECU
+EGYP
+ESA
+ESRO
+EST
+EUME
+EUTE
+FGER
+FR
+FRIT
+GER
+GLOB
+GREC
+HUN
+IM
+IND
+INDO
+IRAN
+IRAQ
+ISRA
+ISS
+IT
+ITSO
+JPN
+KAZ
+LAOS
+LTU
+LUXE
+MALA
+MEX
+NATO
+NETH
+NICO
+NIG
+NKOR
+NOR
+O3B
+ORB
+PAKI
+PERU
+POL
+POR
+PRC
+RASC
+ROC
+ROM
+RP
+SAFR
+SAUD
+SEAL
+SES
+SING
+SKOR
+SPN
+STCT
+SWED
+SWTZ
+TBD
+THAI
+TMMC
+TURK
+UAE
+UK
+UKR
+URY
+US
+USBZ
+VENZ
+VTNM
+END Owner
+
+BEGIN Mission
+Astronomy
+Comm
+Earth Sci
+Engineer
+Human Crew
+Life Sci
+Micro Grav
+Navigation
+Planet Sci
+Resupply
+Solar Phys
+Space Phys
+Space Sci
+Surv/Mil
+Tech App
+Unknown
+END Mission
+
