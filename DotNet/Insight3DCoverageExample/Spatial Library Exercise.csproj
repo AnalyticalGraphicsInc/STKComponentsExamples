@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A7CD7711-4551-43CE-938B-A6DEFC897007}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Spatial_Library_Exercise</RootNamespace>
+    <AssemblyName>Spatial Library Exercise</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AGI.Foundation.AircraftPropagation">
+      <HintPath>..\components_dlls\AGI.Foundation.AircraftPropagation.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Cesium">
+      <HintPath>..\components_dlls\AGI.Foundation.Cesium.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Communications">
+      <HintPath>..\components_dlls\AGI.Foundation.Communications.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Core">
+      <HintPath>..\components_dlls\AGI.Foundation.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Graphics">
+      <HintPath>..\components_dlls\AGI.Foundation.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Models">
+      <HintPath>..\components_dlls\AGI.Foundation.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Navigation">
+      <HintPath>..\components_dlls\AGI.Foundation.Navigation.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Navigation.Advanced">
+      <HintPath>..\components_dlls\AGI.Foundation.Navigation.Advanced.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.OrbitPropagation">
+      <HintPath>..\components_dlls\AGI.Foundation.OrbitPropagation.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Platforms">
+      <HintPath>..\components_dlls\AGI.Foundation.Platforms.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Platforms.Graphics">
+      <HintPath>..\components_dlls\AGI.Foundation.Platforms.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Radar">
+      <HintPath>..\components_dlls\AGI.Foundation.Radar.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.RouteDesign">
+      <HintPath>..\components_dlls\AGI.Foundation.RouteDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.SegmentPropagation">
+      <HintPath>..\components_dlls\AGI.Foundation.SegmentPropagation.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Spatial">
+      <HintPath>..\components_dlls\AGI.Foundation.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.TerrainAnalysis">
+      <HintPath>..\components_dlls\AGI.Foundation.TerrainAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.TerrainReaders">
+      <HintPath>..\components_dlls\AGI.Foundation.TerrainReaders.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Tracking">
+      <HintPath>..\components_dlls\AGI.Foundation.Tracking.dll</HintPath>
+    </Reference>
+    <Reference Include="AGI.Foundation.Tracking.Graphics">
+      <HintPath>..\components_dlls\AGI.Foundation.Tracking.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Insight3DHelper.cs" />
+    <Compile Include="OverlayToolbar.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="STKUtil.cs" />
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Data\Models\goldfoil4.tga" />
+    <None Include="Data\Models\iridium.mdl" />
+    <None Include="Data\Models\iridium_ant-panel.tga" />
+    <None Include="Data\Models\iridium_grid.tga" />
+    <None Include="Data\Models\iridium_panels.tga" />
+    <None Include="Data\Models\metal.tga" />
+    <None Include="Data\Models\therma.tga" />
+    <None Include="Data\Pennsylvania.at">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\SatelliteDatabase\stkAllTLE.fr" />
+    <None Include="Data\SatelliteDatabase\stkAllTLE.gd" />
+    <None Include="Data\SatelliteDatabase\stkAllTLE.om" />
+    <None Include="Data\SatelliteDatabase\stkAllTLE.sd" />
+    <None Include="Data\SatelliteDatabase\stkAllTLE.tce" />
+    <None Include="Data\SatelliteDatabase\stkAllTLE.wr" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.fr" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.gd" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.om" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.sd" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.tce" />
+    <None Include="Data\SatelliteDatabase\stkSatDb.wr" />
+    <None Include="Data\Virginia.at">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\West Virginia.at">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\Markers\facility.png" />
+    <Content Include="Data\Markers\smallsatellite.png" />
+    <Content Include="Data\Textures\OverlayToolbar\decreasedelta.png" />
+    <Content Include="Data\Textures\OverlayToolbar\home.png" />
+    <Content Include="Data\Textures\OverlayToolbar\increasedelta.png" />
+    <Content Include="Data\Textures\OverlayToolbar\invisible.png" />
+    <Content Include="Data\Textures\OverlayToolbar\moon.png" />
+    <Content Include="Data\Textures\OverlayToolbar\pan.png" />
+    <Content Include="Data\Textures\OverlayToolbar\panpressed.png" />
+    <Content Include="Data\Textures\OverlayToolbar\pause.png" />
+    <Content Include="Data\Textures\OverlayToolbar\playforward.png" />
+    <Content Include="Data\Textures\OverlayToolbar\playreverse.png" />
+    <Content Include="Data\Textures\OverlayToolbar\reset.png" />
+    <Content Include="Data\Textures\OverlayToolbar\rotate.png" />
+    <Content Include="Data\Textures\OverlayToolbar\scale.png" />
+    <Content Include="Data\Textures\OverlayToolbar\stepforward.png" />
+    <Content Include="Data\Textures\OverlayToolbar\stepreverse.png" />
+    <Content Include="Data\Textures\OverlayToolbar\visible.png" />
+    <Content Include="Data\Textures\OverlayToolbar\zoom.png" />
+    <Content Include="Data\Textures\OverlayToolbar\zoompressed.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
