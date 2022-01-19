@@ -1,6 +1,6 @@
 # STK Components Examples
 
-This repository showcases example applications for STK Components, a commercial product from Analytical Graphics, Inc. (AGI)
+This repository showcases example applications for STK Components, a commercial product from AGI, an Ansys Company.
 
 ## What is STK Components?
 
