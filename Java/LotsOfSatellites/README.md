@@ -2,7 +2,7 @@
 
 This application uses [Sgp4Propagator](https://help.agi.com/AGIComponentsJava/Javadoc/agi-foundation-propagators-Sgp4Propagator.html) to propagate up to 10,000 satellites, which are visualized in Insight3D using [MarkerBatchPrimitive](https://help.agi.com/AGIComponentsJava/Javadoc/agi-foundation-graphics-MarkerBatchPrimitive.html). Satellites shown in red have access to a ground station located in Australia.
 
-![Lots of Satellites](Images/ExampleLotsOfSatellites.jpg)
+![Lots of Satellites](Images/ExampleLotsOfSatellitesJava.png)
 
 ## Compilation
 
