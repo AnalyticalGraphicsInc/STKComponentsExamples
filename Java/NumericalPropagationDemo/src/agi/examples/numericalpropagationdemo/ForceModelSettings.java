@@ -34,8 +34,11 @@ import agi.foundation.celestial.AtmosphericDragForce;
 import agi.foundation.celestial.CentralBodiesFacet;
 import agi.foundation.celestial.CentralBody;
 import agi.foundation.celestial.ConstantSolarGeophysicalData;
+import agi.foundation.celestial.EarthCentralBody;
+import agi.foundation.celestial.Iers2003SolidTideModel;
 import agi.foundation.celestial.JplDE;
 import agi.foundation.celestial.JplDECentralBody;
+import agi.foundation.celestial.PermanentSolidTideModel;
 import agi.foundation.celestial.ScalarAtmosphericDensity;
 import agi.foundation.celestial.ScalarDensityJacchiaRoberts;
 import agi.foundation.celestial.ScalarDensityMsis2000;
@@ -45,6 +48,7 @@ import agi.foundation.celestial.ScalarOccultationCylindrical;
 import agi.foundation.celestial.ScalarOccultationDualCone;
 import agi.foundation.celestial.SimpleSolarRadiationForce;
 import agi.foundation.celestial.SolarGeophysicalData;
+import agi.foundation.celestial.SolidTideModel;
 import agi.foundation.celestial.SphericalHarmonicGravity;
 import agi.foundation.celestial.SphericalHarmonicGravityField;
 import agi.foundation.celestial.SphericalHarmonicGravityModel;
@@ -224,6 +228,7 @@ public class ForceModelSettings extends JDialog {
                         m_moon3B.setEnabled(true);
                         m_dragUse.setEnabled(true);
                         m_dragUse.setSelected(m_lastDragSelection);
+                        m_tides.setEnabled(true);
                         m_centralBody = CentralBodiesFacet.getFromContext().getEarth();
                     }
                     if (newCBName.equals(MOON)) {
@@ -232,8 +237,8 @@ public class ForceModelSettings extends JDialog {
                         m_dragUse.setSelected(false);
                         m_dragUse.setEnabled(false);
                         m_moon3B.setEnabled(false);
+                        m_tides.setEnabled(false);
                         m_centralBody = CentralBodiesFacet.getFromContext().getMoon();
-
                     }
                     m_gravitationalParameter = m_gravConstants.get(newCBName.toUpperCase());
                 });
@@ -356,6 +361,7 @@ public class ForceModelSettings extends JDialog {
                 }
                 m_tides.addItem(PERMANENTTIDES);
                 m_tides.addItem(NOTIDES);
+                m_tides.addItem(TIMEVARYINGTIDES);
             }
 
         }
@@ -928,18 +934,27 @@ public class ForceModelSettings extends JDialog {
                     CentralBodiesFacet.getFromContext().getByName(primaryCB), m_gravConstants.get(primaryCB.toUpperCase()));
             point.getAppliedForces().add(gravity);
         } else {
-            SphericalHarmonicsTideType tideType = SphericalHarmonicsTideType.NONE;
-            if (NOTIDES.equals(m_tides.getSelectedItem().toString())) {
-                tideType = SphericalHarmonicsTideType.NONE;
-            } else if (PERMANENTTIDES.equals(m_tides.getSelectedItem().toString())) {
-                tideType = SphericalHarmonicsTideType.PERMANENT_TIDE_ONLY;
+            SphericalHarmonicGravityModel model = SphericalHarmonicGravityModel.readFrom(m_gravityFieldFile.getText());
+            SolidTideModel tideModel;
+            if (m_tides.isEnabled()) {
+                // Only enabled if Earth is selected as central body.
+                if (NOTIDES.equals(m_tides.getSelectedItem().toString())) {
+                    model = model.getIncludesPermanentTides() ? model.withoutEarthPermanentTides() : model;
+                    tideModel = null;
+                } else if (PERMANENTTIDES.equals(m_tides.getSelectedItem().toString())) {
+                    tideModel = model.getIncludesPermanentTides() ? null : new PermanentSolidTideModel();
+                } else {
+                    model = model.getIncludesPermanentTides() ? model.withoutEarthPermanentTides() : model;
+                    tideModel = new Iers2003SolidTideModel(((EarthCentralBody)m_centralBody).getOrientationParameters());
+                }
+            } else {
+                tideModel = null;
             }
 
             int order = Integer.parseInt(m_order.getText());
             int degree = Integer.parseInt(m_degree.getText());
-            SphericalHarmonicGravityModel model = SphericalHarmonicGravityModel.readFrom(m_gravityFieldFile.getText());
             SphericalHarmonicGravity gravity = new SphericalHarmonicGravity(point.getIntegrationPoint(),
-                    new SphericalHarmonicGravityField(model, degree, order, true, tideType));
+                    new SphericalHarmonicGravityField(model, degree, order, true, tideModel));
             point.getAppliedForces().add(gravity);
 
             if (!gravity.getGravityField().getCentralBody().getName().toUpperCase().contentEquals(primaryCB.toUpperCase())) {
@@ -1019,6 +1034,7 @@ public class ForceModelSettings extends JDialog {
     private final String DUALCONE = "Dual Cone";
     private final String CYLINDRICAL = "Cylindrical";
 
+    private final String TIMEVARYINGTIDES = "TimeVarying";
     private final String PERMANENTTIDES = "Permanent";
     private final String NOTIDES = "None";
 

@@ -242,12 +242,7 @@ public class Main extends JFrame {
         SceneManager.setAnimation(animation);
 
         // Subscribe to the time changed event so we can update our display.
-        SceneManager.addTimeChanged(new EventHandler<TimeChangedEventArgs>() {
-            @Override
-            public void invoke(Object sender, TimeChangedEventArgs e) {
-                sceneManagerTimeChanged(sender, e);
-            }
-        });
+        SceneManager.addTimeChanged(EventHandler.of(this::sceneManagerTimeChanged));
 
         // Reset to the beginning.
         animation.reset();

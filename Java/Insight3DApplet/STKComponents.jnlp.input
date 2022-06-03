@@ -2,7 +2,7 @@
 <jnlp spec="6.0+" codebase="" href="">
 	<information>
 		<title>STK Components</title>
-		<vendor>Analytical Graphics, Inc.</vendor>
+		<vendor>AGI, an Ansys Company</vendor>
 	</information>
 
 	<resources>

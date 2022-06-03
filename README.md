@@ -8,9 +8,9 @@ STK Components provides powerful class libraries for either .NET or Java to help
 
 More information about STK Components is available from [AGI's website](https://www.agi.com).
 
-The STK Components documentation (available for [.NET](http://help.agi.com/AGIComponents/html/Welcome.htm) and [Java](http://help.agi.com/AGIComponentsJava/html/Welcome.htm)) includes a Programmer's Guide as well as full API documentation for the complete set of capabilities provided by STK Components.
+The STK Components documentation (available for [.NET](https://help.agi.com/AGIComponents/html/Welcome.htm) and [Java](https://help.agi.com/AGIComponentsJava/html/Welcome.htm)) includes a Programmer's Guide as well as full API documentation for the complete set of capabilities provided by STK Components.
 
-Full system requirements for STK Components are listed in the documentation ([.NET](http://help.agi.com/AGIComponents/html/SystemRequirements.htm) / [Java](http://help.agi.com/AGIComponentsJava/html/SystemRequirements.htm)).
+Full system requirements for STK Components are listed in the documentation ([.NET](https://help.agi.com/AGIComponents/html/SystemRequirements.htm) / [Java](https://help.agi.com/AGIComponentsJava/html/SystemRequirements.htm)).
 
 ## What are these example applications?
 

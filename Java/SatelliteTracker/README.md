@@ -6,7 +6,7 @@ This Swing application computes access between a user-selected satellite viewed 
 
 ![Satellite Tracker](Images/ExampleSatelliteTrackerJava2.png)
 
-For more information on the application, see [the topic for this example](http://help.agi.com/AGIComponentsJava/html/ExampleSatelliteTrackerJava.htm) in the STK Components documentation.
+For more information on the application, see [the topic for this example](https://help.agi.com/AGIComponentsJava/html/ExampleSatelliteTrackerJava.htm) in the STK Components documentation.
 
 ## Compilation
 

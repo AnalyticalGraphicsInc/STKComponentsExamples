@@ -13,13 +13,13 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: AssemblyCompany("Analytical Graphics, Inc.")]
+[assembly: AssemblyCompany("AGI, an Ansys Company")]
 [assembly: AssemblyProduct("STK Components")]
-[assembly: AssemblyCopyright("Copyright © 2007-2019 Analytical Graphics, Inc.")]
+[assembly: AssemblyCopyright("Copyright © 2007-2022 Analytical Graphics, Inc.")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("19.3.400.0")]
-[assembly: AssemblyFileVersion("19.3.400.0")]
+[assembly: AssemblyVersion("22.1.413.0")]
+[assembly: AssemblyFileVersion("22.1.413.0")]
 [assembly: NeutralResourcesLanguage("en-US")]
 

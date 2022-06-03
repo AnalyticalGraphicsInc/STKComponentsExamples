@@ -2,35 +2,35 @@
 <classpath>
   <classpathentry kind="src" path="src" />
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8" />
-  <classpathentry kind="lib" path="jars/agi.foundation.core-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.core-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
     </attributes>
   </classpathentry>
-  <classpathentry kind="lib" path="jars/agi.foundation.graphics-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.graphics-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
       <attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Insight3DApplet/jars" />
     </attributes>
   </classpathentry>
-  <classpathentry kind="lib" path="jars/agi.foundation.models-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.models-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
     </attributes>
   </classpathentry>
-  <classpathentry kind="lib" path="jars/agi.foundation.platforms-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.platforms-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
     </attributes>
   </classpathentry>
-  <classpathentry kind="lib" path="jars/agi.foundation.platforms.graphics-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.platforms.graphics-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
     </attributes>
   </classpathentry>
-  <classpathentry kind="lib" path="jars/agi.foundation.terrainreaders-2019r3.jar">
+  <classpathentry kind="lib" path="jars/agi.foundation.terrainreaders-2022r1.jar">
     <attributes>
-      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2019r3.zip!/" />
+      <attribute name="javadoc_location" value="jar:platform:/resource/Insight3DApplet/doc/agi.foundation.javadoc-2022r1.zip!/" />
     </attributes>
   </classpathentry>
   <classpathentry kind="output" path="bin" />

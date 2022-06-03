@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+using AGI.Foundation;
 using AGI.Foundation.Celestial;
 using AGI.Foundation.Geometry;
 using AGI.Foundation.Propagators;
@@ -58,6 +60,7 @@ namespace AGI.Examples
             m_gravFile.Text = gravityFile;
             m_tides.Items.Add(PERMANENTTIDES);
             m_tides.Items.Add(NOTIDES);
+            m_tides.Items.Add(TIMEVARYINGTIDES);
             m_tides.SelectedIndex = 0;
             m_tides.DropDownStyle = ComboBoxStyle.DropDownList;
 
@@ -68,6 +71,7 @@ namespace AGI.Examples
             m_lastCB = EARTH;
             CurrentCentralBody = CentralBodiesFacet.GetFromContext().Earth;
             m_primaryCB.SelectedItem = EARTH;
+            CurrentCentralBodysGravitationalParameter = m_gravConstants[m_primaryCB.SelectedItem.ToString()];
 
             // adding all of the possible third bodies
             foreach (KeyValuePair<string, double> pair in m_gravConstants)
@@ -195,17 +199,40 @@ namespace AGI.Examples
             }
             else
             {
-                SphericalHarmonicsTideType tideType = SphericalHarmonicsTideType.None;
-                if (m_tides.SelectedItem.ToString() == NOTIDES)
-                    tideType = SphericalHarmonicsTideType.None;
-                else if (m_tides.SelectedItem.ToString() == PERMANENTTIDES)
-                    tideType = SphericalHarmonicsTideType.PermanentTideOnly;
-
                 int order = int.Parse(m_order.Text);
                 int degree = int.Parse(m_degree.Text);
                 SphericalHarmonicGravityModel model = SphericalHarmonicGravityModel.ReadFrom(m_gravFile.Text);
+                SolidTideModel tideModel;
+                if (m_tides.Enabled)
+                {
+                    // Only enabled if Earth is selected as central body.
+                    switch (m_tides.SelectedItem.ToString())
+                    {
+                        case NOTIDES:
+                            if (model.IncludesPermanentTides)
+                                model = model.WithoutEarthPermanentTides();
+                            tideModel = null;
+                            break;
+                        case PERMANENTTIDES:
+                            tideModel = model.IncludesPermanentTides ? null : new PermanentSolidTideModel();
+                            break;
+                        case TIMEVARYINGTIDES:
+                            if (model.IncludesPermanentTides)
+                                model = model.WithoutEarthPermanentTides();
+                            tideModel = new Iers2003SolidTideModel(((EarthCentralBody)m_centralBody).OrientationParameters);
+                            break;
+                        default:
+                            throw new UnsupportedCaseException("Invalid tide parameter selection.");
+                    }
+                }
+                else
+                {
+                    // For other central bodies, tides will be automatically inherited from the .grv files based on whether they include permanent tides or not.
+                    tideModel = null;
+                }
+
                 SphericalHarmonicGravity gravity = new SphericalHarmonicGravity(point.IntegrationPoint,
-                                                                                new SphericalHarmonicGravityField(model, degree, order, true, tideType));
+                                                                                new SphericalHarmonicGravityField(model, degree, order, true, tideModel));
                 point.AppliedForces.Add(gravity);
 
                 if (gravity.GravityField.CentralBody.Name != primaryCB)
@@ -258,26 +285,29 @@ namespace AGI.Examples
         /// <param name="e">Additional information about this event.</param>
         private void OnPrimaryCBSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (m_primaryCB.SelectedItem.ToString() != m_lastCB)
+            if (m_primaryCB.SelectedItem.ToString() == m_lastCB)
+                return;
+
+            m_thirdBodies.Items.Remove(m_primaryCB.SelectedItem.ToString());
+            m_thirdBodies.Items.Add(m_lastCB);
+            m_lastCB = m_primaryCB.SelectedItem.ToString();
+            if (m_primaryCB.SelectedItem.ToString() != EARTH)
             {
-                m_thirdBodies.Items.Remove(m_primaryCB.SelectedItem.ToString());
-                m_thirdBodies.Items.Add(m_lastCB);
-                m_lastCB = m_primaryCB.SelectedItem.ToString();
-                if (m_primaryCB.SelectedItem.ToString() != EARTH)
-                {
-                    // we only have drag models for the earth
-                    m_lastDragChecked = m_useDrag.Checked;
-                    m_useDrag.Checked = false;
-                    m_useDrag.Enabled = false;
-                }
-                else
-                {
-                    m_useDrag.Checked = m_lastDragChecked;
-                    m_useDrag.Enabled = true;
-                }
-                CurrentCentralBodysGravitationalParameter = m_gravConstants[m_primaryCB.SelectedItem.ToString()];
-                CurrentCentralBody = CentralBodiesFacet.GetFromContext().GetByName(m_primaryCB.SelectedItem.ToString());
+                // we only have drag models for the earth
+                m_lastDragChecked = m_useDrag.Checked;
+                m_useDrag.Checked = false;
+                m_useDrag.Enabled = false;
+                // We only have default permanent and time-varying tides for Earth.
+                m_tides.Enabled = false;
             }
+            else
+            {
+                m_useDrag.Checked = m_lastDragChecked;
+                m_useDrag.Enabled = true;
+                m_tides.Enabled = true;
+            }
+            CurrentCentralBodysGravitationalParameter = m_gravConstants[m_primaryCB.SelectedItem.ToString()];
+            CurrentCentralBody = CentralBodiesFacet.GetFromContext().GetByName(m_primaryCB.SelectedItem.ToString());
         }
 
         /// <summary>
@@ -355,6 +385,7 @@ namespace AGI.Examples
         private const string DUALCONE = "Dual Cone";
         private const string CYLINDRICAL = "Cylindrical";
 
+        private const string TIMEVARYINGTIDES = "TimeVarying";
         private const string PERMANENTTIDES = "Permanent";
         private const string NOTIDES = "None";
     }

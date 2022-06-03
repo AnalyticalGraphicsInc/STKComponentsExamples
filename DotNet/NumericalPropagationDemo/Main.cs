@@ -176,6 +176,8 @@ namespace AGI.Examples
         /// </summary>
         private void PropagateSatellite()
         {
+            m_keplerianOrbitalElementsEntry.GravitationalConstant =
+                m_forceModelSettings.CurrentCentralBodysGravitationalParameter;
             KeplerianElements orbitalElements = m_keplerianOrbitalElementsEntry.KeplerianElementValues;
             if (orbitalElements == null)
                 return;

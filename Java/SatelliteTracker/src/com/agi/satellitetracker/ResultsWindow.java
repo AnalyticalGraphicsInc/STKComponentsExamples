@@ -1,16 +1,18 @@
 package com.agi.satellitetracker;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,16 +21,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import org.jdesktop.swingx.JXMapKit;
-import org.jdesktop.swingx.JXMapViewer;
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
-import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
-import org.jdesktop.swingx.mapviewer.Waypoint;
-import org.jdesktop.swingx.mapviewer.WaypointPainter;
-import org.jdesktop.swingx.painter.CompoundPainter;
-import org.jdesktop.swingx.painter.Painter;
+import org.jxmapviewer.JXMapKit;
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.CompoundPainter;
+import org.jxmapviewer.painter.Painter;
+import org.jxmapviewer.viewer.DefaultWaypoint;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.WaypointPainter;
 
 import agi.foundation.Trig;
 import agi.foundation.coordinates.AzimuthElevationRange;
@@ -57,18 +57,17 @@ public class ResultsWindow extends JFrame {
         JXMapKit jxMapKit = new JXMapKit();
         jxMapKit.setMiniMapVisible(false);
 
-        // use the shared tile factory
-        jxMapKit.setTileFactory(s_tileFactory);
-
         jxMapKit.setZoom(15);
-        jxMapKit.setAddressLocation(new GeoPosition(userInput.getLatitude(), userInput.getLongitude()));
+
+        GeoPosition geoPosition = new GeoPosition(userInput.getLatitude(), userInput.getLongitude());
+        jxMapKit.setAddressLocation(geoPosition);
 
         // create a waypoint marker for the facility position
         Set<Waypoint> waypoints = new HashSet<>();
-        waypoints.add(new Waypoint(userInput.getLatitude(), userInput.getLongitude()));
+        waypoints.add(new DefaultWaypoint(geoPosition));
 
         // construct a waypoint painter that will draw the facility waypoint
-        WaypointPainter<JXMapViewer> wayPointPainter = new WaypointPainter<>();
+        WaypointPainter<Waypoint> wayPointPainter = new WaypointPainter<>();
         wayPointPainter.setWaypoints(waypoints);
 
         // construct our custom map painter class
@@ -76,8 +75,9 @@ public class ResultsWindow extends JFrame {
 
         // construct a compound painter that will use both painters, and use it
         // as the painter for the map
-        CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(wayPointPainter, groundTrackPainter);
+        CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(Arrays.asList(wayPointPainter, groundTrackPainter));
         painter.setCacheable(false);
+
         jxMapKit.getMainMap().setOverlayPainter(painter);
 
         contentPane.add(jxMapKit, BorderLayout.CENTER);
@@ -117,21 +117,18 @@ public class ResultsWindow extends JFrame {
             List<Path2D.Double> accessPaths = new ArrayList<>();
             List<Path2D.Double> noAccessPaths = new ArrayList<>();
 
-            Iterator<GroundTrackPosition> groundTrackIterator = m_groundTracks.iterator();
-
             Path2D.Double path = new Path2D.Double();
-            GroundTrackPosition first = groundTrackIterator.next();
+            GroundTrackPosition first = m_groundTracks.get(0);
             addMoveTo(map, path, first.getPosition());
 
             GroundTrackPosition previousPosition = first;
             boolean previousPositionAccess = first.hasAccess();
-            while (groundTrackIterator.hasNext()) {
-                GroundTrackPosition position = groundTrackIterator.next();
+            for (int i = 1; i < m_groundTracks.size(); ++i) {
+                GroundTrackPosition position = m_groundTracks.get(i);
 
                 if (previousPositionAccess != position.hasAccess()) {
-                    // if we are switching from access to no access (or vice
-                    // versa) then put the path we build into the appropriate
-                    // list and start a new path
+                    // if we are switching from access to no access (or vice-versa) 
+                    // then put the path we build into the appropriate list and start a new path
                     if (previousPositionAccess)
                         accessPaths.add(path);
                     else
@@ -143,11 +140,9 @@ public class ResultsWindow extends JFrame {
 
                 if (Math.abs(previousPosition.getLongitude() - position.getLongitude()) > Math.PI) {
                     // handle case where ground track crosses the international
-                    // date line and longitude wraps from -180 deg to 180 deg
-                    // (or vice-versa).
+                    // date line and longitude wraps from -180 deg to 180 deg (or vice-versa).
 
-                    // Use simple linear interpolation to find the position on
-                    // the date line.
+                    // Use simple linear interpolation to find the position on the date line.
                     GroundTrackPosition interpolated = findPointOnEdge(previousPosition, position);
 
                     // draw line to interpolated position
@@ -194,6 +189,10 @@ public class ResultsWindow extends JFrame {
 
             // ...one translated to the copy of the map to the right of the on-screen edge
             g2.translate(viewportBounds.getX() - vpx + mapSizeInPixels.getWidth(), 0);
+
+            Stroke stroke = new BasicStroke(3.0f);
+            g1.setStroke(stroke);
+            g2.setStroke(stroke);
 
             // draw no access paths in red
             g1.setColor(Color.RED);
@@ -345,26 +344,5 @@ public class ResultsWindow extends JFrame {
         private final List<AzimuthElevationRange> m_departureAers;
     }
 
-    static {
-        final int max = 17;
-        // These parameters copied from JXMapKit.setDefaultProvider when passed
-        // DefaultProviders.OpenStreetMaps
-        s_tileFactory = new DefaultTileFactory(
-                new TileFactoryInfo(1, max - 2, max, 256, true, true, "http://tile.openstreetmap.org", "x", "y", "z") {
-                    @Override
-                    public String getTileUrl(int x, int y, int zoom) {
-                        zoom = max - zoom;
-                        return baseURL + "/" + zoom + "/" + x + "/" + y + ".png";
-                    }
-                });
-    }
-
     private static final long serialVersionUID = 1L;
-
-    /**
-     * create a single TileFactory shared between all result windows, because
-     * otherwise, JXMapKit creates a new one every time and there's currently no
-     * way to dispose it properly.
-     */
-    private static final TileFactory s_tileFactory;
 }

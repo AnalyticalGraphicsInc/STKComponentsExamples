@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.io.File;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -16,13 +15,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
-
-import com.agi.satellitetracker.GoogleGeocoder.GeocoderResult;
 
 import agi.foundation.stk.StkSatelliteDatabase;
 import agi.foundation.time.GregorianDate;
@@ -50,10 +46,6 @@ public class SatelliteTracker extends JFrame {
         m_calculateButton = new JButton("Calculate");
 
         m_calculateButton.addActionListener(e -> {
-            if (m_addressButton.isSelected()) {
-                m_lookupButton.doClick();
-            }
-
             Computation computation = new Computation(m_userInput);
             ResultsWindow resultsWindow = new ResultsWindow(m_userInput, computation);
             resultsWindow.setVisible(true);
@@ -101,17 +93,6 @@ public class SatelliteTracker extends JFrame {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(LOCATION_BORDER_LABEL));
 
-        m_addressButton = new JRadioButton(ADDRESS_BUTTON_LABEL, m_userInput.getUseAddress());
-        m_addressButton.addActionListener(e -> m_userInput.setUseAddress(true));
-
-        m_latitudeLongitudeButton = new JRadioButton(LAT_LONG_BUTTON_LABEL, !m_userInput.getUseAddress());
-        m_latitudeLongitudeButton.addActionListener(e -> m_userInput.setUseAddress(false));
-
-        ButtonGroup locationGroup = new ButtonGroup();
-        locationGroup.add(m_addressButton);
-        locationGroup.add(m_latitudeLongitudeButton);
-
-        JPanel addressPanel = createAddressPanel();
         JPanel latitudeLongitudePanel = createLatitudeLongitudePanel();
         JPanel elevationPanel = createElevationPanel();
 
@@ -121,19 +102,14 @@ public class SatelliteTracker extends JFrame {
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
-        JLabel locationLabel1 = new JLabel(LOCATION_LABEL_1);
-        JLabel locationLabel2 = new JLabel(LOCATION_LABEL_2);
+        JLabel locationLabel = new JLabel(LOCATION_LABEL);
         JLabel elevationLabel1 = new JLabel(ELEVATION_LABEL_1);
         JLabel elevationLabel2 = new JLabel(ELEVATION_LABEL_2);
 
         {
             // Horizontal group
             Group group = layout.createParallelGroup();
-            group.addComponent(locationLabel1);
-            group.addComponent(locationLabel2);
-            group.addComponent(m_addressButton);
-            group.addComponent(addressPanel);
-            group.addComponent(m_latitudeLongitudeButton);
+            group.addComponent(locationLabel);
             group.addComponent(latitudeLongitudePanel);
             group.addComponent(elevationLabel1);
             group.addComponent(elevationLabel2);
@@ -144,66 +120,11 @@ public class SatelliteTracker extends JFrame {
         {
             // Vertical group
             Group group = layout.createSequentialGroup();
-            group.addComponent(locationLabel1);
-            group.addComponent(locationLabel2);
-            group.addComponent(m_addressButton);
-            group.addComponent(addressPanel);
-            group.addComponent(m_latitudeLongitudeButton);
+            group.addComponent(locationLabel);
             group.addComponent(latitudeLongitudePanel);
             group.addComponent(elevationLabel1);
             group.addComponent(elevationLabel2);
             group.addComponent(elevationPanel);
-            layout.setVerticalGroup(group);
-        }
-
-        return panel;
-    }
-
-    private JPanel createAddressPanel() {
-        JPanel panel = new JPanel();
-
-        m_locationField = new JTextField(m_userInput.getAddress(), 40);
-        m_locationField.getDocument().addDocumentListener(new DocumentListenerAdapter() {
-            @Override
-            protected void documentChanged(DocumentEvent e) {
-                m_userInput.setAddress(m_locationField.getText());
-            }
-        });
-
-        m_lookupButton = new JButton("Lookup");
-        m_lookupButton.addActionListener(e -> {
-            // use the Google geocoding web service to get longitude and
-            // latitude for the current address.
-            GeocoderResult result = GoogleGeocoder.geocode(m_userInput.getAddress());
-            m_longitudeField.setText(String.valueOf(result.longitudeDegrees));
-            m_latitudeField.setText(String.valueOf(result.latitudeDegrees));
-            m_latitudeLongitudeButton.setSelected(true);
-        });
-
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        JLabel locationLabel = makeBold(new JLabel(LOCATION_LABEL));
-        locationLabel.setLabelFor(m_locationField);
-
-        {
-            // Horizontal group
-            Group group = layout.createSequentialGroup();
-            group.addComponent(locationLabel);
-            group.addComponent(m_locationField);
-            group.addComponent(m_lookupButton);
-            layout.setHorizontalGroup(group);
-        }
-
-        {
-            // Vertical group
-            Group group = layout.createParallelGroup(Alignment.BASELINE);
-            group.addComponent(locationLabel);
-            group.addComponent(m_locationField);
-            group.addComponent(m_lookupButton);
             layout.setVerticalGroup(group);
         }
 
@@ -530,13 +451,8 @@ public class SatelliteTracker extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private static final String LOCATION_BORDER_LABEL = "Select a viewing location";
-    private static final String LOCATION_LABEL_1 = "Where are you?";
-    private static final String LOCATION_LABEL_2 = "Enter an address, city, state, and zip code, or latitude and longitude.";
+    private static final String LOCATION_LABEL = "Where are you? Enter latitude and longitude.";
 
-    private static final String ADDRESS_BUTTON_LABEL = "Specify Address, and either City/State or Zip Code";
-    private static final String LAT_LONG_BUTTON_LABEL = "Specify Latitude and Longitude";
-
-    private static final String LOCATION_LABEL = "Location:";
     private static final String LATITUDE_LABEL = "Latitude (deg):";
     private static final String LONGITUDE_LABEL = "Longitude (deg):";
 
@@ -560,9 +476,6 @@ public class SatelliteTracker extends JFrame {
     private final UserInput m_userInput;
     private final Database m_database;
 
-    private JRadioButton m_addressButton;
-    private JRadioButton m_latitudeLongitudeButton;
-    private JTextField m_locationField;
     private JTextField m_longitudeField;
     private JTextField m_latitudeField;
     private JTextField m_elevationField;
@@ -572,5 +485,4 @@ public class SatelliteTracker extends JFrame {
     private JTextField m_startDateField;
     private JTextField m_endDateField;
     private final JButton m_calculateButton;
-    private JButton m_lookupButton;
 }

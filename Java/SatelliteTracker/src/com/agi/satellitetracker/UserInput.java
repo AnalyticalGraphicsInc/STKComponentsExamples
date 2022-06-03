@@ -11,14 +11,6 @@ public class UserInput {
         m_endDate = new GregorianDate(startDate.toDateTime().plusDays(1));
     }
 
-    public String getAddress() {
-        return m_address;
-    }
-
-    public void setAddress(String address) {
-        m_address = address;
-    }
-
     public double getLatitude() {
         return m_latitude;
     }
@@ -83,23 +75,12 @@ public class UserInput {
         m_tle = tle;
     }
 
-    public boolean getUseAddress() {
-        return m_useAddress;
-    }
-
-    public void setUseAddress(boolean useAddress) {
-        m_useAddress = useAddress;
-    }
-
-    private static final String DEFAULT_ADDRESS = "220 Valley Creek Blvd, Exton, PA";
     private static final double DEFAULT_LATITUDE = 40.0385776;
     private static final double DEFAULT_LONGITUDE = -75.5966244;
     private static final double DEFAULT_ELEVATION = 10.0;
     private static final String DEFAULT_SPACECRAFT_CATEGORY = "Human Crew";
     private static final String DEFAULT_SPACECRAFT = "ISS";
 
-    private boolean m_useAddress = false;
-    private String m_address = DEFAULT_ADDRESS;
     private double m_latitude = DEFAULT_LATITUDE;
     private double m_longitude = DEFAULT_LONGITUDE;
     private double m_elevation = DEFAULT_ELEVATION;

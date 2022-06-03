@@ -47,9 +47,9 @@ public class Computation {
         createSatellite(userInput);
         createFacility(userInput);
 
-        AccessEvaluator accessEval = createAccessEvaluator(userInput);
+        AccessEvaluator accessEvaluator = createAccessEvaluator(userInput);
 
-        calculateAccess(accessEval);
+        calculateAccess(accessEvaluator);
         calculateApproachAndDeparture();
         calculateGroundTrack();
     }
@@ -76,9 +76,8 @@ public class Computation {
     private void createFacility(UserInput userInput) {
         EarthCentralBody earth = CentralBodiesFacet.getFromContext().getEarth();
 
-        // Create a facility at the viewing location. The longitude and latitude
-        // of the facility's location are specified using radians, so convert
-        // degrees to radians.
+        // Create a facility at the viewing location. The longitude and latitude of the 
+        // facility's location are specified using radians, so convert degrees to radians.
         double longitude = Trig.degreesToRadians(userInput.getLongitude());
         double latitude = Trig.degreesToRadians(userInput.getLatitude());
 
@@ -204,7 +203,7 @@ public class Computation {
             // GroundTrackPosition
             m_groundTracks.add(new GroundTrackPosition(evaluator.evaluate(date), hasAccess));
 
-            date = date.add(s_roundTrackTimeStep);
+            date = date.add(s_groundTrackTimeStep);
         }
         // add a final ground position for the end time
         m_groundTracks.add(new GroundTrackPosition(evaluator.evaluate(end), hasAccess));
@@ -237,7 +236,7 @@ public class Computation {
     /**
      * The duration of each ground track segment.
      */
-    private static final Duration s_roundTrackTimeStep = Duration.fromSeconds(60.0);
+    private static final Duration s_groundTrackTimeStep = Duration.fromSeconds(60.0);
     private final JulianDate m_startDate;
     private final JulianDate m_endDate;
     private Platform m_satellite;
