@@ -24,11 +24,11 @@ The ant build script (build.xml) will do the following:
     This is necessary because JNLP requires all native resources to be packaged
     into a JAR file to be loaded automatically.
   * The native JAR files and the JAR containing the applet code itself 
-    are signed using a certificate.  The STK Components JAR files are already
+    are signed using a certificate.  The DME Component Libraries JAR files are already
     signed by AGI.  Details about the keystore used for signing are provided below.
   * A JNLP file is created by replacing a placeholder token with the names of 
-    the STK Components JAR files.  This avoids making the example dependent on 
-    a particular version of STK Components.
+    the DME Component Libraries JAR files.  This avoids making the example dependent on 
+    a particular version of DME Component Libraries.
   * All JAR files, the JNLP file, and a HTML file loading the applet are placed 
     in the site directory.  
 
@@ -60,4 +60,4 @@ certificate under the alias "cert".
 
 For reference, this keystore was created using the following command:
 
-`keytool -genkey -keystore keystore -storepass keystore -keypass keystore -alias cert -validity 3600 -dname "CN=demo, OU=demo, O=demo, L=demo, ST=PA, C=US" `
+`keytool -genkey -keystore keystore -storepass keystore -keypass keystore -alias cert -validity 3600 -dname "CN=demo, OU=demo, O=demo, L=demo, ST=PA, C=US"`

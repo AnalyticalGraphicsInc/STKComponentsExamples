@@ -11,11 +11,17 @@ namespace AGI.Examples
     public static class LeapSecondsFacetHelper
     {
         /// <summary>
-        /// Tries to download LeapSecond.dat, which lists all leap seconds from 1970 to the present, from AGI's server.
-        /// If AGI's server is unavailable (i.e. if the machine on which the demo is running is not connected 
-        /// to the internet), pulls LeapSecond.dat from the local Data directory.
+        /// Tries to download LeapSecond.dat, which lists all leap seconds from 1970 to the present, from an AGI server.
+        /// If the download fails, which could occur if the server is unavailable,
+        /// or if the machine on which the demo is running is not connected to the internet,
+        /// then a local copy of LeapSecond.dat is loaded from the Data directory.
         /// </summary>
         public static LeapSecondsFacet GetLeapSeconds()
+        {
+            return Download() ?? LoadLocal();
+        }
+
+        private static LeapSecondsFacet Download()
         {
             try
             {
@@ -23,10 +29,18 @@ namespace AGI.Examples
             }
             catch (DataUnavailableException)
             {
-                // Read from local file if the machine does not have access to the internet.
-                string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.RelativeSearchPath ?? "", "Data");
-                return LeapSecondFile.ReadLeapSeconds(Path.Combine(dataPath, "LeapSecond.dat"));
+                return null;
             }
+        }
+
+        /// <summary>
+        /// Read from local data if internet is not available.
+        /// </summary>
+        private static LeapSecondsFacet LoadLocal()
+        {
+            string dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.RelativeSearchPath ?? "", "Data");
+            string fileName = Path.Combine(dataDirectory, "LeapSecond.dat");
+            return LeapSecondFile.ReadLeapSeconds(fileName);
         }
     }
 }

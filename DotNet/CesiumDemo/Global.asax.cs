@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using System.Web.Routing;
 using AGI.Examples;
 using AGI.Foundation.Infrastructure;
 
@@ -12,6 +13,10 @@ namespace CesiumDemo
             // Get leap second data, and use it in the current calculation context.
             LeapSecondsFacetHelper.GetLeapSeconds().UseInCurrentContext();
             CalculationContext.DefaultForNewContexts = CalculationContext.Instance;
+
+            // Register a route to serve static Cesium files directly from the
+            // Cesium zip file, to make running this simple demo application easier.
+            CesiumStaticFileHandler.RegisterRoutes(RouteTable.Routes);
         }
 
         protected void Session_Start(object sender, EventArgs e)

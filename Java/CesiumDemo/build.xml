@@ -28,7 +28,7 @@
 	</target>
 
 	<target name="compile" depends="prepare" description="Compile source code.">
-		<fail message="License not present. Copy your STK Components license file, AGI.Foundation.lic, into the src folder.">
+		<fail message="License not present. Copy your DME Component Libraries license file, AGI.Foundation.lic, into the src folder.">
 			<condition>
 				<not>
 					<available file="src/AGI.Foundation.lic" />
@@ -42,13 +42,6 @@
 			<include name="agi/examples/cesium/**" />
 		</javac>
 
-		<copy todir="${bin.dir}/Data">
-			<fileset dir="../Common/Data">
-				<include name="LeapSecond.dat" />
-				<include name="SatelliteDatabase/stkSatDb*" />
-				<include name="Terrain/StHelens.pdtt" />
-			</fileset>
-		</copy>
 		<copy todir="${bin.dir}">
 			<fileset dir="web" />
 		</copy>
@@ -77,6 +70,16 @@
 				<attribute name="Main-Class" value="agi.examples.cesium.Application" />
 			</manifest>
 		</jar>
+
+		<!-- Copy other resources to the dist directory -->
+		<copy todir="${dist.dir}/Data">
+			<fileset dir="../Common/Data">
+				<include name="LeapSecond.dat" />
+				<include name="SatelliteDatabase/stkSatDb*" />
+				<include name="Terrain/StHelens.pdtt" />
+			</fileset>
+			<fileset dir="Cesium" includes="**" />
+		</copy>
 	</target>
 
 	<target name="run" depends="package" description="Build and run the demo application.">

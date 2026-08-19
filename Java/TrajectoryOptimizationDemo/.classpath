@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<classpath>
+	<classpathentry kind="src" path="src" />
+	<classpathentry including="EOP-v1.1.txt|LeapSecond.dat|Textures/OverlayToolbar/decreasedelta.png|Textures/OverlayToolbar/home.png|Textures/OverlayToolbar/increasedelta.png|Textures/OverlayToolbar/invisible.png|Textures/OverlayToolbar/moon.png|Textures/OverlayToolbar/pan.png|Textures/OverlayToolbar/panpressed.png|Textures/OverlayToolbar/pause.png|Textures/OverlayToolbar/playforward.png|Textures/OverlayToolbar/playreverse.png|Textures/OverlayToolbar/reset.png|Textures/OverlayToolbar/rotate.png|Textures/OverlayToolbar/scale.png|Textures/OverlayToolbar/stepforward.png|Textures/OverlayToolbar/stepreverse.png|Textures/OverlayToolbar/visible.png|Textures/OverlayToolbar/zoom.png|Textures/OverlayToolbar/zoompressed.png" kind="src" output="Data" path="commonData" />
+	<classpathentry including="agi/examples/EarthOrientationParametersHelper.java|agi/examples/Insight3DHelper.java|agi/examples/LeapSecondsFacetHelper.java|agi/examples/OverlayToolbar.java" kind="src" path="commonSrc" />
+	<classpathentry including="Markers/smallsatellite.png|Models/satellite.mdl|Textures/OverlayToolbar/fewsatellites.png" kind="src" output="Data" path="projectData" />
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8" />
+	<classpathentry kind="lib" path="jars/agi.foundation.core-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.graphics-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /><attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="TrajectoryOptimizationDemo/jars" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.models-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.orbitpropagation-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.platforms.graphics-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.platforms-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	<classpathentry kind="lib" path="jars/agi.foundation.segmentpropagation-2026r3.jar"><attributes><attribute name="javadoc_location" value="jar:platform:/resource/TrajectoryOptimizationDemo/doc/agi.foundation.javadoc-2026r3.zip!/" /></attributes></classpathentry>
+	
+	<classpathentry kind="output" path="bin" />
+</classpath>

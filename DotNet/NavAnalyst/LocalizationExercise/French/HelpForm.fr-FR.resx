@@ -124,7 +124,7 @@ L’application NavAnalyst vous permet de générer un graphe de valeurs de Dimi
 
 Pour créer un graphe de DOP or de Précision de Navigation:
  
-1) Dans l’onglet « Almanach », sélectionnez un almanach SEM valide pour la date de l’analyse que vous souhaitez réaliser. Un almanach pour la date du 21 juin 2007 est installé par défaut avec l’application. Vous pouvez télécharger d’autres fichiers d’almanach à l’adresse suivante : ftp://ftp.agi.com/pub/Catalog/Almanacs
+1) Dans l’onglet « Almanach », sélectionnez un almanach SEM valide pour la date de l’analyse que vous souhaitez réaliser. Un almanach pour la date du 21 juin 2007 est installé par défaut avec l’application. Vous pouvez télécharger d’autres fichiers d’almanach à l’adresse suivante : https://data.agi.com/pub/Catalog/Almanacs
 
 2) Définissez les dates de début et de fin de l’analyse en précisant s’il s’agit de dates UTC ou GPS
  

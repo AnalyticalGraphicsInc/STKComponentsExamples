@@ -121,7 +121,7 @@
     <value>NavAnalyst permette di tracciare un diagramma dei valori di Dilution of Precision e di accuratezza per un determinato ricevitore e di esportare un almanacco delle effemeridi nei file AGI-standard delle effemeridi di tipo ‘.e’.
 
 Per creare tracciati DOP o di accuratezza:
-1) Utilizzando l’etichetta “Almanacco”, individuare una almanacco SEM valido per il tempo che si intende analizzare. Un almanacco per il giorno 21 Giugno 2007 è già fornito con l’applicazione. Ulteriori almanacchi possono essere reperiti utilizzando il seguente URL: ftp://ftp.agi.com/pub/Catalog/Almanacs
+1) Utilizzando l’etichetta “Almanacco”, individuare una almanacco SEM valido per il tempo che si intende analizzare. Un almanacco per il giorno 21 Giugno 2007 è già fornito con l’applicazione. Ulteriori almanacchi possono essere reperiti utilizzando il seguente URL: https://data.agi.com/pub/Catalog/Almanacs
 2) Impostare il tempo di inizio e quello di fine intervallo di analisi e specificare se questi tempi sono in UTC time o GPS time. 
 3) Impostare l’intervallo temporale (time step) per l’analisi. I valori di DOP verranno calcolati per ogni time step
 4) Selezionare l’etichetta “Ricevitore” ed impostare i parametri del ricevitore relativi alla situazione in esame includendo anche la locazione. 

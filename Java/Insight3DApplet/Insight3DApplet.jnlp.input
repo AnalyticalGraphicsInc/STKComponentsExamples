@@ -2,7 +2,7 @@
 <jnlp spec="6.0+" codebase="" href="">
 	<information>
 		<title>Insight3DApplet</title>
-		<vendor>AGI, an Ansys Company</vendor>
+		<vendor>Ansys Government Initiatives (AGI)</vendor>
 	</information>
 
 	<resources arch="amd64">
@@ -13,7 +13,7 @@
 	<resources>
 		<jar href="Insight3DApplet.jar" main="true" />
 
-		<extension name="STK Components" href="STKComponents.jnlp" />
+		<extension name="DME Component Libraries" href="DMEComponentLibraries.jnlp" />
 	</resources>
 
 	<security>

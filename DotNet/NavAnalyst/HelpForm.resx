@@ -141,7 +141,7 @@ as export the almanac ephemeris to Analytical Graphics Inc. standard '.e' epheme
 To create DOP or accuracy plots, do the following:
 1) On the Almanac tab, browse to a SEM almanac valid for the time you wish to analyze. One almanac
        for March 20, 2017 has been included with this application. Additional almanacs can be found 
-       on the AGI FTP site, located here: ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM
+       on the AGI FTP site, located here: https://data.agi.com/pub/Catalog/Almanacs/SEM
 2) Set the start and stop time of the analysis and select whether these times are in UTC or GPS time. 
 3) Set the time step for the analysis. DOP and accuracy values will be calculated at each time step.
 4) Click the receiver tab and set the receiver parameters specific to your situation, including location.

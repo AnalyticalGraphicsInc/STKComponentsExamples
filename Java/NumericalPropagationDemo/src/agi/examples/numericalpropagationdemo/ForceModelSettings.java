@@ -52,7 +52,6 @@ import agi.foundation.celestial.SolidTideModel;
 import agi.foundation.celestial.SphericalHarmonicGravity;
 import agi.foundation.celestial.SphericalHarmonicGravityField;
 import agi.foundation.celestial.SphericalHarmonicGravityModel;
-import agi.foundation.celestial.SphericalHarmonicsTideType;
 import agi.foundation.celestial.ThirdBodyGravity;
 import agi.foundation.celestial.TwoBodyGravity;
 import agi.foundation.geometry.Scalar;

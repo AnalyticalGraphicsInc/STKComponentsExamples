@@ -34,6 +34,7 @@ public class Main {
             scrollPane.setPreferredSize(new Dimension(700, 300));
             textArea.setEditable(false);
             JOptionPane.showMessageDialog(null, scrollPane, "Unhandled Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         });
 
         // startup data configuration

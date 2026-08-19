@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+        <listEntry value="/TrajectoryOptimizationDemo/src/agi/examples/trajectoryoptimizationdemo/Main.java"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+        <listEntry value="1"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+        <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+        <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="agi.examples.trajectoryoptimizationdemo.Main"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="TrajectoryOptimizationDemo"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="TrajectoryOptimizationDemo"/>
+</launchConfiguration>

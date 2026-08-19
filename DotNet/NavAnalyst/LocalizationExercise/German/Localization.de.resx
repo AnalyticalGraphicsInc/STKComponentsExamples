@@ -145,7 +145,7 @@
     <value>Grad</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>NavAnalyst präsentiert einige der neuen Fähigkeiten, die durch die Navigationswerkzeuge von der STK Components verfügbar werden.</value>
+    <value>NavAnalyst präsentiert einige der neuen Fähigkeiten, die durch die Navigationswerkzeuge von der DME Component Libraries verfügbar werden.</value>
   </data>
   <data name="DOPAnalysis" xml:space="preserve">
     <value>DOP Analyse</value>

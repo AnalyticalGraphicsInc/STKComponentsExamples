@@ -32,6 +32,7 @@ import agi.foundation.cesium.AzimuthElevationMaskGraphicsExtension;
 import agi.foundation.cesium.AzimuthElevationMaskGraphicsProjection;
 import agi.foundation.cesium.CesiumHeightReference;
 import agi.foundation.cesium.CesiumInterpolationAlgorithm;
+import agi.foundation.cesium.CesiumPathMode;
 import agi.foundation.cesium.CesiumPositionExtension;
 import agi.foundation.cesium.CesiumResource;
 import agi.foundation.cesium.CesiumResourceBehavior;
@@ -56,6 +57,7 @@ import agi.foundation.cesium.SensorFieldOfViewGraphics;
 import agi.foundation.cesium.SolidColorMaterialGraphics;
 import agi.foundation.cesium.StripeMaterialGraphics;
 import agi.foundation.cesium.VectorGraphics;
+import agi.foundation.cesium.advanced.IPolylineMaterialGraphics;
 import agi.foundation.coordinates.AngleAxisRotation;
 import agi.foundation.coordinates.AxisIndicator;
 import agi.foundation.coordinates.Cartesian;
@@ -114,25 +116,28 @@ public class CesiumDemo {
         m_earth = CentralBodiesFacet.getFromContext().getEarth();
 
         // Create all objects for our scenario.
-
-        // Each of these helper methods create some of the objects
-        // which are stored in fields.
         // The work is divided up across methods to make the code easier to follow.
+
+        // First, create the platforms.
         createSatellite();
         createFacility();
         createSatelliteAccessLink();
-        createFacilitySensor();
         createSensorDome();
         createAzimuthElevationMask();
         createAircraft();
+
+        // Configure the platforms with extensions to specify how they should be displayed.
+        configureSatelliteGraphics();
+        configureFacilityGraphics();
+        configureSatelliteAccessLinkGraphics();
+        configureFacilitySensorGraphics();
+        configureSensorDomeGraphics();
+        configureAzimuthElevationMaskGraphics();
+        configureAircraftGraphics();
     }
 
     /**
      * Create a Platform for the requested satellite using a TLE for position.
-     * The satellite will be visually represented by a labeled glTF model,
-     * the satellite's orbit will be shown, and vectors will be drawn for
-     * the body axes of the satellite, plus a vector indicating the direction
-     * of the sun.
      */
     private void createSatellite() {
         // Get the current TLE for the given satellite identifier.
@@ -152,7 +157,253 @@ public class CesiumDemo {
 
         // Set the identifier for the satellite in the CZML document.
         m_satellite.getExtensions().add(new IdentifierExtension(m_satelliteIdentifier));
+    }
 
+    /**
+     * Create a facility at the location of AGI headquarters, with a sensor.
+     * The sensor will be oriented to target the satellite.
+     */
+    private void createFacility() {
+        // Define the location of the facility using cartographic coordinates.
+        Cartographic location = new Cartographic(Trig.degreesToRadians(-75.596872), Trig.degreesToRadians(40.038969), 100.0);
+        Point locationPoint = new PointCartographic(m_earth, location);
+        m_facility = new Platform();
+        m_facility.setName("AGI HQ");
+        m_facility.setLocationPoint(locationPoint);
+
+        // Orient the facility using East-North-Up (ENU) axes.
+        m_facility.setOrientationAxes(new AxesEastNorthUp(m_earth, locationPoint));
+
+        // Set the identifier for the facility in the CZML document. 
+        m_facility.getExtensions().add(new IdentifierExtension("AGI"));
+
+        m_facilitySensor = new Platform();
+        // Use the same location point as the facility.
+        m_facilitySensor.setLocationPoint(m_facility.getLocationPoint());
+
+        // Set the identifier for the facility sensor in the CZML document. 
+        m_facilitySensor.getExtensions().add(new IdentifierExtension("Sensor"));
+
+        // Define the sensor geometry.
+        RectangularPyramid fieldOfView = new RectangularPyramid();
+        fieldOfView.setXHalfAngle(Trig.degreesToRadians(8.0));
+        fieldOfView.setYHalfAngle(Trig.degreesToRadians(4.5));
+        fieldOfView.setRadialLimits(0.0, 500000.0);
+
+        m_facilitySensor.getExtensions().add(new FieldOfViewExtension(fieldOfView));
+    }
+
+    /**
+     * Create an access link between AGI HQ and the satellite.
+     */
+    private void createSatelliteAccessLink() {
+        m_satelliteFacilityLink = new LinkInstantaneous(m_facility, m_satellite);
+
+        // Set the identifier for the link in the CZML document. 
+        m_satelliteFacilityLink.getExtensions().add(new IdentifierExtension("SatelliteFacilityAccess"));
+
+        // Orient the facility sensor to target the link with the satellite.
+        m_facilitySensor.setOrientationAxes(new AxesTargetingLink(m_satelliteFacilityLink, LinkRole.TRANSMITTER,
+                new VectorFixed(m_satellite.getOrientationAxes(), Cartesian.toCartesian(UnitCartesian.getUnitZ()))));
+
+        // Specify how access should be constrained.
+        // In this case, access will only exist when no part of the earth is between AGI HQ and the satellite.
+        m_accessQuery = new CentralBodyObstructionConstraint(m_satelliteFacilityLink, m_earth);
+    }
+
+    /**
+     * Create another ground facility with a sensor dome, and a rotating sensor inside the dome.
+     */
+    private void createSensorDome() {
+        // Define the location of the facility using cartographic coordinates.
+        Point locationPoint = new PointCartographic(m_earth, new Cartographic(Trig.degreesToRadians(-122.3), Trig.degreesToRadians(46), 456.359));
+
+        m_sensorDome = new Platform();
+        m_sensorDome.setName("Sensor Dome");
+        m_sensorDome.setLocationPoint(locationPoint);
+        m_sensorDome.setOrientationAxes(new AxesEastNorthUp(m_earth, locationPoint));
+
+        // Set the identifier for the facility in the CZML document. 
+        m_sensorDome.getExtensions().add(new IdentifierExtension("SensorDome"));
+
+        // Define the sensor geometry.
+        ComplexConic domeFieldOfView = new ComplexConic();
+        domeFieldOfView.setHalfAngles(0.0, Math.PI);
+        domeFieldOfView.setClockAngles(0.0, Math.PI * 2);
+        domeFieldOfView.setRadialLimits(0.0, 10000.0);
+
+        m_sensorDome.getExtensions().add(new FieldOfViewExtension(domeFieldOfView));
+
+        // Define a rotating axes.
+        AxesLinearRate rotatingAxes = new AxesLinearRate();
+        rotatingAxes.setReferenceAxes(new AxesEastNorthUp(m_earth, locationPoint));
+        rotatingAxes.setReferenceEpoch(m_epoch);
+        rotatingAxes.setInitialRotation(UnitQuaternion.getIdentity());
+        rotatingAxes.setSpinAxis(UnitCartesian.getUnitZ());
+        rotatingAxes.setInitialRotationalVelocity(Trig.degreesToRadians(5.0)); // 5 degrees per second
+        rotatingAxes.setRotationalAcceleration(0.0);
+
+        // Define a rotation around X.
+        UnitQuaternion quaternion = new UnitQuaternion(new AngleAxisRotation(Math.PI / 3.0, UnitCartesian.getUnitX()));
+        // Define an angular offset for the rotating axes.
+        Axes rotatedOffsetAxes = new AxesFixedOffset(rotatingAxes, quaternion);
+
+        m_rotatingSensor = new Platform();
+        m_rotatingSensor.setName("Rotating Sensor");
+        m_rotatingSensor.setLocationPoint(locationPoint);
+        m_rotatingSensor.setOrientationAxes(rotatedOffsetAxes);
+
+        // Set the identifier for the sensor in the CZML document. 
+        m_rotatingSensor.getExtensions().add(new IdentifierExtension("RotatingSensor"));
+
+        // Define the sensor geometry.
+        RectangularPyramid rotatingFieldOfView = new RectangularPyramid();
+        rotatingFieldOfView.setXHalfAngle(Trig.degreesToRadians(30));
+        rotatingFieldOfView.setYHalfAngle(Trig.degreesToRadians(30));
+        rotatingFieldOfView.setRadialLimits(0.0, 10000.0);
+
+        m_rotatingSensor.getExtensions().add(new FieldOfViewExtension(rotatingFieldOfView));
+    }
+
+    /**
+     * Create an azimuth-elevation mask.
+     */
+    private void createAzimuthElevationMask() {
+        // load terrain data for Mount St. Helens.
+        TerrainProvider terrain = new AGIProcessedDataTerrain("Data/Terrain/StHelens.pdtt");
+
+        // Calculate the surface position at the center of the terrain
+        double longitude = (terrain.getBoundingExtent().getWestLongitude() + terrain.getBoundingExtent().getEastLongitude()) / 2.0;
+        double latitude = (terrain.getBoundingExtent().getNorthLatitude() + terrain.getBoundingExtent().getSouthLatitude()) / 2.0;
+        Cartographic observerPosition = new Cartographic(longitude, latitude, terrain.getHeight(longitude, latitude));
+
+        // Sample using 360 azimuth rays at 0.000275 degrees
+        final int numberOfAzimuthSteps = 360;
+        double stepSize = Trig.degreesToRadians(0.000275);
+        final double maxSearchAngle = 0.025;
+
+        // Compute the mask.
+        AzimuthElevationMask mask = TerrainAzimuthElevationMask.compute(terrain, observerPosition, numberOfAzimuthSteps, stepSize, maxSearchAngle);
+
+        Point locationPoint = new PointCartographic(m_earth, observerPosition);
+        m_maskPlatform = new Platform();
+        m_maskPlatform.setName("Azimuth Elevation Mask");
+        m_maskPlatform.setLocationPoint(locationPoint);
+        m_maskPlatform.setOrientationAxes(new AxesNorthEastDown(m_earth, locationPoint));
+
+        // Set the identifier for the mask in the CZML document. 
+        m_maskPlatform.getExtensions().add(new IdentifierExtension("Mask"));
+
+        // Attach the computed mask.
+        m_maskPlatform.getExtensions().add(new AzimuthElevationMaskExtension(mask));
+    }
+
+    /**
+     * Create an aircraft with two sensors attached to the wings.
+     */
+    private void createAircraft() {
+        // Define waypoints for the aircraft's path, then use the propagated point as the location point.
+        Cartographic point1 = new Cartographic(Trig.degreesToRadians(-122.0), Trig.degreesToRadians(46.3), 4000.0);
+        Cartographic point2 = new Cartographic(Trig.degreesToRadians(-122.28), Trig.degreesToRadians(46.25), 4100.0);
+        Cartographic point3 = new Cartographic(Trig.degreesToRadians(-122.2), Trig.degreesToRadians(46.1), 6000.0);
+        Cartographic point4 = new Cartographic(Trig.degreesToRadians(-121.5), Trig.degreesToRadians(46.0), 7000.0);
+
+        Waypoint waypoint1 = new Waypoint(m_epoch, point1, 20.0, 0.0);
+        Waypoint waypoint2 = new Waypoint(waypoint1, m_earth.getShape(), point2, 20.0);
+        Waypoint waypoint3 = new Waypoint(waypoint2, m_earth.getShape(), point3, 20.0);
+        Waypoint waypoint4 = new Waypoint(waypoint3, m_earth.getShape(), point4, 20.0);
+
+        m_aircraftWaypoints = Arrays.asList(waypoint1, waypoint2, waypoint3, waypoint4);
+
+        WaypointPropagator waypointPropagator = new WaypointPropagator(m_earth, m_aircraftWaypoints);
+        Point locationPoint = waypointPropagator.createPoint();
+
+        m_aircraft = new Platform();
+        m_aircraft.setName("Aircraft");
+        m_aircraft.setLocationPoint(locationPoint);
+        m_aircraft.setOrientationAxes(new AxesVehicleVelocityLocalHorizontal(m_earth.getFixedFrame(), locationPoint));
+
+        // Set the identifier for the aircraft in the CZML document. 
+        m_aircraft.getExtensions().add(new IdentifierExtension("Aircraft"));
+
+        // Hermite interpolation works better for aircraft-like vehicles.
+        CesiumPositionExtension cesiumPositionExtension = new CesiumPositionExtension();
+        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
+        m_aircraft.getExtensions().add(cesiumPositionExtension);
+
+        // Define a description for the aircraft which will be shown when selected in Cesium.
+        m_aircraft.getExtensions().add(new DescriptionExtension(new Description("Aircraft with two offset sensors")));
+
+        // Create 30 degree simple conic sensor definition
+        ComplexConic sensorFieldOfView = new ComplexConic();
+        sensorFieldOfView.setHalfAngles(0.0, Trig.degreesToRadians(15));
+        sensorFieldOfView.setClockAngles(Trig.degreesToRadians(20), Trig.degreesToRadians(50));
+
+        // Create a sensor pointing "forward".
+        // Position sensor underneath the wing.
+        Point sensorOneLocationPoint = new PointFixedOffset(m_aircraft.getReferenceFrame(), new Cartesian(-3.0, 8.0, 0.0));
+        Axes sensorAxesOne = new AxesAlignedConstrained(m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Z), AxisIndicator.THIRD,
+                m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.X), AxisIndicator.FIRST);
+        // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
+        UnitQuaternion rotationOne = new UnitQuaternion(new ElementaryRotation(AxisIndicator.SECOND, Constants.HalfPi / 4));
+
+        m_aircraftSensorOne = new Platform();
+        m_aircraftSensorOne.setLocationPoint(sensorOneLocationPoint);
+        m_aircraftSensorOne.setOrientationAxes(new AxesFixedOffset(sensorAxesOne, rotationOne));
+
+        // Set the identifier for the sensor in the CZML document. 
+        m_aircraftSensorOne.getExtensions().add(new IdentifierExtension("AircraftSensorOne"));
+
+        cesiumPositionExtension = new CesiumPositionExtension();
+        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
+        m_aircraftSensorOne.getExtensions().add(cesiumPositionExtension);
+
+        // Define the sensor geometry.
+        m_aircraftSensorOne.getExtensions().add(new FieldOfViewExtension(sensorFieldOfView));
+
+        // Create sensor pointing to the "side".
+        // Position sensor underneath the wing.
+        Point sensorTwoLocationPoint = new PointFixedOffset(m_aircraft.getReferenceFrame(), new Cartesian(-3.0, -8.0, 0.0));
+        Axes sensorAxesTwo = new AxesAlignedConstrained(m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Z), AxisIndicator.THIRD,
+                m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Y), AxisIndicator.SECOND);
+
+        // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
+        UnitQuaternion rotationTwo = new UnitQuaternion(new ElementaryRotation(AxisIndicator.FIRST, Constants.HalfPi / 2));
+
+        m_aircraftSensorTwo = new Platform();
+        m_aircraftSensorTwo.setLocationPoint(sensorTwoLocationPoint);
+        m_aircraftSensorTwo.setOrientationAxes(new AxesFixedOffset(sensorAxesTwo, rotationTwo));
+
+        // Set the identifier for the sensor in the CZML document. 
+        m_aircraftSensorTwo.getExtensions().add(new IdentifierExtension("AircraftSensorTwo"));
+
+        cesiumPositionExtension = new CesiumPositionExtension();
+        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
+        m_aircraftSensorTwo.getExtensions().add(cesiumPositionExtension);
+
+        // Define the sensor geometry.
+        m_aircraftSensorTwo.getExtensions().add(new FieldOfViewExtension(sensorFieldOfView));
+
+        // Create an access link between the aircraft and the observer position
+        // on Mount St. Helens, using the same azimuth elevation mask to constrain access.
+
+        m_aircraftAzimuthElevationMaskLink = new LinkInstantaneous(m_maskPlatform, m_aircraft);
+
+        // Set the identifier for the link in the CZML document. 
+        m_aircraftAzimuthElevationMaskLink.getExtensions().add(new IdentifierExtension("AircraftMountStHelensAccess"));
+
+        // Constrain access using the azimuth-elevation mask.
+        m_aircraftAzimuthElevationMaskQuery = new AzimuthElevationMaskConstraint(m_aircraftAzimuthElevationMaskLink, LinkRole.TRANSMITTER);
+    }
+
+    /**
+     * Add extensions to specify how the satellite will be shown.
+     * The satellite will be visually represented by a labeled glTF model,
+     * the satellite's orbit will be shown, and vectors will be drawn for
+     * the body axes of the satellite, plus a vector indicating the direction
+     * of the sun.
+     */
+    private void configureSatelliteGraphics() {
         // Configure a glTF model for the satellite.
         ModelGraphics modelGraphics = new ModelGraphics();
 
@@ -171,7 +422,7 @@ public class CesiumDemo {
         labelGraphics.setText(toCesiumProperty(m_satellite.getName()));
 
         // Change the color of the label after 12 hours. This demonstrates specifying that 
-        // a value varies over time using intervals.
+        // a value can vary over time using intervals.
         TimeIntervalCollection1<Color> fillColor = new TimeIntervalCollection1<>();
 
         // Green for the first half day...
@@ -191,14 +442,29 @@ public class CesiumDemo {
         // Configure graphical display of the orbital path of the satellite.
         PathGraphics pathGraphics = new PathGraphics();
 
-        // Configure the visual appearance of the line.
-        PolylineOutlineMaterialGraphics pathGraphicsMaterial = new PolylineOutlineMaterialGraphics();
-        pathGraphicsMaterial.setColor(toCesiumProperty(WHITE));
-        pathGraphicsMaterial.setOutlineWidth(toCesiumProperty(1.0));
-        pathGraphicsMaterial.setOutlineColor(toCesiumProperty(BLACK));
-        pathGraphics.setMaterial(toCesiumProperty(pathGraphicsMaterial));
+        // Indicate periods of access by coloring the orbital path of the satellite.
+        pathGraphics.setMaterialMode(toCesiumProperty(CesiumPathMode.PORTIONS));
 
-        pathGraphics.setWidth(toCesiumProperty(2.0));
+        AccessQueryCesiumProperty<IPolylineMaterialGraphics> pathGraphicsMaterialProperty = new AccessQueryCesiumProperty<>();
+        pathGraphicsMaterialProperty.setQuery(m_accessQuery);
+
+        // During periods of access, use a green line.
+        PolylineOutlineMaterialGraphics pathGraphicsAccessExistsMaterial = new PolylineOutlineMaterialGraphics();
+        pathGraphicsAccessExistsMaterial.setColor(toCesiumProperty(GREEN));
+        pathGraphicsAccessExistsMaterial.setOutlineWidth(toCesiumProperty(1.0));
+        pathGraphicsAccessExistsMaterial.setOutlineColor(toCesiumProperty(WHITE));
+
+        // During periods of no access, use a red line.
+        PolylineOutlineMaterialGraphics pathGraphicsNoAccessMaterial = new PolylineOutlineMaterialGraphics();
+        pathGraphicsNoAccessMaterial.setColor(toCesiumProperty(RED));
+        pathGraphicsNoAccessMaterial.setOutlineWidth(toCesiumProperty(1.0));
+        pathGraphicsNoAccessMaterial.setOutlineColor(toCesiumProperty(WHITE));
+
+        pathGraphicsMaterialProperty.setAccessExists(pathGraphicsAccessExistsMaterial);
+        pathGraphicsMaterialProperty.setNoAccess(pathGraphicsNoAccessMaterial);
+
+        pathGraphics.setMaterial(pathGraphicsMaterialProperty);
+        pathGraphics.setWidth(toCesiumProperty(3.0));
 
         // Lead and Trail time indicate how much of the path to render.
         pathGraphics.setLeadTime(toCesiumProperty(Duration.fromMinutes(44.0).getTotalSeconds()));
@@ -215,7 +481,7 @@ public class CesiumDemo {
 
         // Compute the vector from the satellite's location to the Sun's center of mass.
         Point sunCenterOfMassPoint = CentralBodiesFacet.getFromContext().getSun().getCenterOfMassPoint();
-        VectorTrueDisplacement vectorSatelliteToSun = new VectorTrueDisplacement(m_satellite.getLocationPoint(), sunCenterOfMassPoint);
+        Vector vectorSatelliteToSun = new VectorTrueDisplacement(m_satellite.getLocationPoint(), sunCenterOfMassPoint);
 
         // Create the visual vector.
         m_satelliteSunVector = new GraphicalVector();
@@ -238,7 +504,7 @@ public class CesiumDemo {
         Axes constrainedAxes = new AxesAlignedConstrained(satelliteYVector, AxisIndicator.FIRST, vectorSatelliteToSun, AxisIndicator.SECOND);
 
         // Satellite axes are Vehicle Velocity Local Horizontal (VVLH) axes, where X is forward and Z is down,
-        // but Cesium model axes are Z forward, Y up. So, create an axes rotates to the Cesium model axes.
+        // but Cesium model axes are Z forward, Y up. So, create an axes that rotates to the Cesium model axes.
         UnitQuaternion offset = new UnitQuaternion(new ElementaryRotation(AxisIndicator.FIRST, -Math.PI / 2))
                 .multiply(new UnitQuaternion(new ElementaryRotation(AxisIndicator.THIRD, Math.PI / 2)));
         Axes cesiumModelAxes = new AxesFixedOffset(m_satellite.getOrientationAxes(), offset);
@@ -281,23 +547,10 @@ public class CesiumDemo {
     }
 
     /**
-     * Create a facility at the location of AGI headquarters.
+     * Add extensions to specify how the facility will be shown.
      * The facility will be visually represented by a labeled glTF model.
      */
-    private void createFacility() {
-        // Define the location of the facility using cartographic coordinates.
-        Cartographic location = new Cartographic(Trig.degreesToRadians(-75.596766667), Trig.degreesToRadians(40.0388333333), 0.0);
-        Point locationPoint = new PointCartographic(m_earth, location);
-        m_facility = new Platform();
-        m_facility.setName("AGI HQ");
-        m_facility.setLocationPoint(locationPoint);
-
-        // Orient the facility using East-North-Up (ENU) axes.
-        m_facility.setOrientationAxes(new AxesEastNorthUp(m_earth, locationPoint));
-
-        // Set the identifier for the facility in the CZML document. 
-        m_facility.getExtensions().add(new IdentifierExtension("AGI"));
-
+    private void configureFacilityGraphics() {
         // Configure a glTF model for the facility.
         ModelGraphics modelGraphics = new ModelGraphics();
 
@@ -322,51 +575,23 @@ public class CesiumDemo {
     }
 
     /**
-     * Create an access link between AGI HQ and the satellite.
+     * Add extensions to specify how the access link will be shown.
      */
-    private void createSatelliteAccessLink() {
-        m_satelliteFacilityLink = new LinkInstantaneous(m_facility, m_satellite);
-
-        // Set the identifier for the link in the CZML document. 
-        m_satelliteFacilityLink.getExtensions().add(new IdentifierExtension("SatelliteFacilityAccess"));
-
-        // Specify how access should be constrained.  In this case, 
-        // access will only exist when no part of the earth is between AGI HQ and the satellite.
-        m_accessQuery = new CentralBodyObstructionConstraint(m_satelliteFacilityLink, m_earth);
-
+    private void configureSatelliteAccessLinkGraphics() {
         // Configure graphical display of the access link.
         LinkGraphics linkGraphics = new LinkGraphics();
 
         // Show the access link only when access is satisfied.
         linkGraphics.setShow(new AccessQueryCesiumProperty<>(m_accessQuery, true, false, false));
-
         linkGraphics.setMaterial(toCesiumProperty(new SolidColorMaterialGraphics(YELLOW)));
 
         m_satelliteFacilityLink.getExtensions().add(new LinkGraphicsExtension(linkGraphics));
     }
 
     /**
-     * Create a sensor, attached to the facility, oriented to target the satellite.
+     * Add extensions to specify how the facility sensor will be shown.
      */
-    private void createFacilitySensor() {
-        m_facilitySensor = new Platform();
-        // Use the same location point as the facility.
-        m_facilitySensor.setLocationPoint(m_facility.getLocationPoint());
-        // Orient the sensor to target the link with the satellite.
-        m_facilitySensor.setOrientationAxes(new AxesTargetingLink(m_satelliteFacilityLink, LinkRole.TRANSMITTER,
-                new VectorFixed(m_satellite.getOrientationAxes(), Cartesian.toCartesian(UnitCartesian.getUnitZ()))));
-
-        // Set the identifier for the facility in the CZML document. 
-        m_facilitySensor.getExtensions().add(new IdentifierExtension("Sensor"));
-
-        // Define the sensor geometry.
-        RectangularPyramid fieldOfView = new RectangularPyramid();
-        fieldOfView.setXHalfAngle(Trig.degreesToRadians(8.0));
-        fieldOfView.setYHalfAngle(Trig.degreesToRadians(4.5));
-        fieldOfView.setRadius(500000.0);
-
-        m_facilitySensor.getExtensions().add(new FieldOfViewExtension(fieldOfView));
-
+    private void configureFacilitySensorGraphics() {
         // Configure graphical display of the sensor.
         SensorFieldOfViewGraphics sensorFieldOfViewGraphics = new SensorFieldOfViewGraphics();
 
@@ -385,67 +610,24 @@ public class CesiumDemo {
     }
 
     /**
-     * Create another ground facility with a sensor dome, and a rotating sensor inside the dome.
+     * Add extensions to specify how the sensor dome will be shown.
      */
-    private void createSensorDome() {
-        // Define the location of the facility using cartographic coordinates.
-        Point locationPoint = new PointCartographic(m_earth, new Cartographic(Trig.degreesToRadians(-122.3), Trig.degreesToRadians(46), 456.359));
-
-        m_sensorDome = new Platform();
-        m_sensorDome.setName("Sensor Dome");
-        m_sensorDome.setLocationPoint(locationPoint);
-        m_sensorDome.setOrientationAxes(new AxesEastNorthUp(m_earth, locationPoint));
-
-        // Set the identifier for the facility in the CZML document. 
-        m_sensorDome.getExtensions().add(new IdentifierExtension("SensorDome"));
-
-        // Define the sensor geometry.
-        ComplexConic dome = new ComplexConic();
-        dome.setHalfAngles(0.0, Math.PI);
-        dome.setClockAngles(0.0, Math.PI * 2);
-        dome.setRadius(10000.0);
-        m_sensorDome.getExtensions().add(new FieldOfViewExtension(dome));
-
+    private void configureSensorDomeGraphics() {
         // Configure graphical display of the sensor dome.
         GridMaterialGraphics domeSurfaceMaterial = new GridMaterialGraphics();
         domeSurfaceMaterial.setColor(toCesiumProperty(WHITE));
         domeSurfaceMaterial.setCellAlpha(toCesiumProperty(0.1));
 
+        SolidColorMaterialGraphics ellipsoidSurfaceMaterial = new SolidColorMaterialGraphics();
+        ellipsoidSurfaceMaterial.setColor(toCesiumProperty(colorWithAlpha(WHITE, 25)));
+
         SensorFieldOfViewGraphics sensorFieldOfViewGraphics = new SensorFieldOfViewGraphics();
         sensorFieldOfViewGraphics.setDomeSurfaceMaterial(toCesiumProperty(domeSurfaceMaterial));
+        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(ellipsoidSurfaceMaterial));
 
         m_sensorDome.getExtensions().add(new FieldOfViewGraphicsExtension(sensorFieldOfViewGraphics));
 
-        // Define a rotating axes.
-        AxesLinearRate rotatingAxes = new AxesLinearRate();
-        rotatingAxes.setReferenceAxes(new AxesEastNorthUp(m_earth, locationPoint));
-        rotatingAxes.setReferenceEpoch(m_epoch);
-        rotatingAxes.setInitialRotation(UnitQuaternion.getIdentity());
-        rotatingAxes.setSpinAxis(UnitCartesian.getUnitZ());
-        rotatingAxes.setInitialRotationalVelocity(Trig.degreesToRadians(5.0)); // 5 degrees per second
-        rotatingAxes.setRotationalAcceleration(0.0);
-
-        // Define a rotation around X.
-        UnitQuaternion quaternion = new UnitQuaternion(new AngleAxisRotation(Math.PI / 3.0, UnitCartesian.getUnitX()));
-        // Define an angular offset for the rotating axes.
-        Axes rotatedOffsetAxes = new AxesFixedOffset(rotatingAxes, quaternion);
-
-        m_rotatingSensor = new Platform();
-        m_rotatingSensor.setName("Rotating Sensor");
-        m_rotatingSensor.setLocationPoint(locationPoint);
-        m_rotatingSensor.setOrientationAxes(rotatedOffsetAxes);
-
-        // Set the identifier for the sensor in the CZML document. 
-        m_rotatingSensor.getExtensions().add(new IdentifierExtension("RotatingSensor"));
-
-        // Define the sensor geometry.
-        RectangularPyramid pyramid = new RectangularPyramid();
-        pyramid.setXHalfAngle(Trig.degreesToRadians(30));
-        pyramid.setYHalfAngle(Trig.degreesToRadians(30));
-        pyramid.setRadius(10000.0);
-        m_rotatingSensor.getExtensions().add(new FieldOfViewExtension(pyramid));
-
-        // Configure graphical display of the sensor.
+        // Configure graphical display of the rotating sensor.
         domeSurfaceMaterial = new GridMaterialGraphics();
         domeSurfaceMaterial.setColor(toCesiumProperty(GREEN));
         domeSurfaceMaterial.setCellAlpha(toCesiumProperty(0.5));
@@ -454,48 +636,26 @@ public class CesiumDemo {
         lateralSurfaceMaterial.setColor(toCesiumProperty(PINK));
         lateralSurfaceMaterial.setCellAlpha(toCesiumProperty(0.5));
 
+        ellipsoidSurfaceMaterial = new SolidColorMaterialGraphics();
+        ellipsoidSurfaceMaterial.setColor(toCesiumProperty(BLUE));
+
         sensorFieldOfViewGraphics = new SensorFieldOfViewGraphics();
         sensorFieldOfViewGraphics.setDomeSurfaceMaterial(toCesiumProperty(domeSurfaceMaterial));
         sensorFieldOfViewGraphics.setLateralSurfaceMaterial(toCesiumProperty(lateralSurfaceMaterial));
-        sensorFieldOfViewGraphics.setIntersectionColor(toCesiumProperty(WHITE));
+        sensorFieldOfViewGraphics.setIntersectionColor(toCesiumProperty(colorWithAlpha(WHITE, 32)));
         sensorFieldOfViewGraphics.setShowIntersection(toCesiumProperty(true));
         sensorFieldOfViewGraphics.setShowEllipsoidHorizonSurfaces(toCesiumProperty(true));
+        sensorFieldOfViewGraphics.setShowEllipsoidSurfaces(toCesiumProperty(true));
+        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(ellipsoidSurfaceMaterial));
 
         m_rotatingSensor.getExtensions().add(new FieldOfViewGraphicsExtension(sensorFieldOfViewGraphics));
     }
 
     /**
-     * Create a fan to visualize an azimuth-elevation mask.
+     * Add extensions to specify how the azimuth-elevation mask will be shown.
+     * Use a fan to visualize the mask.
      */
-    private void createAzimuthElevationMask() {
-        // load terrain data for Mount St. Helens.
-        TerrainProvider terrain = new AGIProcessedDataTerrain(new ClasspathStreamFactory("/Data/Terrain/StHelens.pdtt"));
-
-        // Calculate the surface position at the center of the terrain
-        double longitude = (terrain.getBoundingExtent().getWestLongitude() + terrain.getBoundingExtent().getEastLongitude()) / 2.0;
-        double latitude = (terrain.getBoundingExtent().getNorthLatitude() + terrain.getBoundingExtent().getSouthLatitude()) / 2.0;
-        Cartographic observerPosition = new Cartographic(longitude, latitude, terrain.getHeight(longitude, latitude));
-
-        // Sample using 360 azimuth rays at 0.000275 degrees
-        final int numberOfAzimuthSteps = 360;
-        double stepSize = Trig.degreesToRadians(0.000275);
-        final double maxSearchAngle = 0.025;
-
-        // Compute the mask.
-        AzimuthElevationMask mask = TerrainAzimuthElevationMask.compute(terrain, observerPosition, numberOfAzimuthSteps, stepSize, maxSearchAngle);
-
-        Point locationPoint = new PointCartographic(m_earth, observerPosition);
-        m_maskPlatform = new Platform();
-        m_maskPlatform.setName("Azimuth Elevation Mask");
-        m_maskPlatform.setLocationPoint(locationPoint);
-        m_maskPlatform.setOrientationAxes(new AxesNorthEastDown(m_earth, locationPoint));
-
-        // Set the identifier for the mask in the CZML document. 
-        m_maskPlatform.getExtensions().add(new IdentifierExtension("Mask"));
-
-        // Attach the computed mask.
-        m_maskPlatform.getExtensions().add(new AzimuthElevationMaskExtension(mask));
-
+    private void configureAzimuthElevationMaskGraphics() {
         // Define the graphics of the mask.
         StripeMaterialGraphics material = new StripeMaterialGraphics();
         material.setEvenColor(toCesiumProperty(BLUE));
@@ -515,40 +675,17 @@ public class CesiumDemo {
     }
 
     /**
-     * Create an aircraft with two sensors.
+     * Add extensions to specify how the aircraft and attached sensors will be shown.
      * The aircraft will be visually represented by a labeled glTF model.
      */
-    private void createAircraft() {
-        // Define waypoints for the aircraft's path and use the propagated point as the location point.
-        Cartographic point1 = new Cartographic(Trig.degreesToRadians(-122.0), Trig.degreesToRadians(46.3), 4000.0);
-        Cartographic point2 = new Cartographic(Trig.degreesToRadians(-122.28), Trig.degreesToRadians(46.25), 4100.0);
-        Cartographic point3 = new Cartographic(Trig.degreesToRadians(-122.2), Trig.degreesToRadians(46.1), 6000.0);
-        Cartographic point4 = new Cartographic(Trig.degreesToRadians(-121.5), Trig.degreesToRadians(46.0), 7000.0);
-        Waypoint waypoint1 = new Waypoint(m_epoch, point1, 20.0, 0.0);
-        Waypoint waypoint2 = new Waypoint(waypoint1, m_earth.getShape(), point2, 20.0);
-        Waypoint waypoint3 = new Waypoint(waypoint2, m_earth.getShape(), point3, 20.0);
-        Waypoint waypoint4 = new Waypoint(waypoint3, m_earth.getShape(), point4, 20.0);
-        WaypointPropagator waypointPropagator = new WaypointPropagator(m_earth, Arrays.asList(waypoint1, waypoint2, waypoint3, waypoint4));
-        Point locationPoint = waypointPropagator.createPoint();
-
-        m_aircraft = new Platform();
-        m_aircraft.setName("Aircraft");
-        m_aircraft.setLocationPoint(locationPoint);
-        m_aircraft.setOrientationAxes(new AxesVehicleVelocityLocalHorizontal(m_earth.getFixedFrame(), locationPoint));
-
-        // Set the identifier for the aircraft in the CZML document. 
-        m_aircraft.getExtensions().add(new IdentifierExtension("Aircraft"));
-
-        // Hermite interpolation works better for aircraft-like vehicles.
-        CesiumPositionExtension cesiumPositionExtension = new CesiumPositionExtension();
-        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
-        m_aircraft.getExtensions().add(cesiumPositionExtension);
+    private void configureAircraftGraphics() {
 
         // Configure a glTF model for the aircraft.
         ModelGraphics modelGraphics = new ModelGraphics();
 
         // Link to a binary glTF file.
         modelGraphics.setModel(toCesiumProperty(new CesiumResource(getModelUri("aircraft.glb"), CesiumResourceBehavior.LINK_TO)));
+        modelGraphics.setRunAnimations(toCesiumProperty(false));
 
         // Flip the model visually to point Z in the correct direction.
         NodeTransformationGraphics aircraftNodeTransformation = new NodeTransformationGraphics();
@@ -557,8 +694,6 @@ public class CesiumDemo {
         Map<String, NodeTransformationGraphics> nodeTransformations = new HashMap<>();
         nodeTransformations.put("Aircraft", aircraftNodeTransformation);
         modelGraphics.setNodeTransformations(nodeTransformations);
-
-        modelGraphics.setRunAnimations(toCesiumProperty(false));
 
         m_aircraft.getExtensions().add(new ModelGraphicsExtension(modelGraphics));
 
@@ -586,7 +721,7 @@ public class CesiumDemo {
         // Green by default...
         fillColor.add(TimeInterval.getInfinite().addData(GREEN));
         // Red between first and second waypoints.
-        fillColor.add(new TimeInterval1<Color>(waypoint1.getDate(), waypoint2.getDate(), RED));
+        fillColor.add(new TimeInterval1<Color>(m_aircraftWaypoints.get(0).getDate(), m_aircraftWaypoints.get(1).getDate(), RED));
 
         labelGraphics.setFillColor(toCesiumProperty(fillColor));
 
@@ -596,42 +731,11 @@ public class CesiumDemo {
 
         m_aircraft.getExtensions().add(new LabelGraphicsExtension(labelGraphics));
 
-        // Define a description for the aircraft which will be shown when selected in Cesium.
-        m_aircraft.getExtensions().add(new DescriptionExtension(new Description("Aircraft with two offset sensors")));
-
-        // Create 30 degree simple conic sensor definition
-        ComplexConic sensorCone = new ComplexConic();
-        sensorCone.setHalfAngles(0.0, Trig.degreesToRadians(15));
-        sensorCone.setClockAngles(Trig.degreesToRadians(20), Trig.degreesToRadians(50));
-        sensorCone.setRadius(Double.POSITIVE_INFINITY);
-
-        // Create a sensor pointing "forward".
-        // Position sensor underneath the wing.
-        Point sensorOneLocationPoint = new PointFixedOffset(m_aircraft.getReferenceFrame(), new Cartesian(-3.0, 8.0, 0.0));
-        Axes sensorAxesOne = new AxesAlignedConstrained(m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Z), AxisIndicator.THIRD,
-                m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.X), AxisIndicator.FIRST);
-        // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
-        UnitQuaternion rotationOne = new UnitQuaternion(new ElementaryRotation(AxisIndicator.SECOND, Constants.HalfPi / 4));
-
-        m_aircraftSensorOne = new Platform();
-        m_aircraftSensorOne.setLocationPoint(sensorOneLocationPoint);
-        m_aircraftSensorOne.setOrientationAxes(new AxesFixedOffset(sensorAxesOne, rotationOne));
-
-        // Set the identifier for the sensor in the CZML document. 
-        m_aircraftSensorOne.getExtensions().add(new IdentifierExtension("AircraftSensorOne"));
-
-        cesiumPositionExtension = new CesiumPositionExtension();
-        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
-        m_aircraftSensorOne.getExtensions().add(cesiumPositionExtension);
-
-        // Define the sensor geometry.
-        m_aircraftSensorOne.getExtensions().add(new FieldOfViewExtension(sensorCone));
-
-        // Configure graphical display of the sensor.
+        // Configure graphical display of the sensors.
         SensorFieldOfViewGraphics sensorFieldOfViewGraphics = new SensorFieldOfViewGraphics();
 
         // Configure the outline of the projection onto the earth.
-        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(new SolidColorMaterialGraphics(WHITE)));
+        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(new SolidColorMaterialGraphics(BLUE)));
         sensorFieldOfViewGraphics.setIntersectionWidth(toCesiumProperty(2.0));
 
         GridMaterialGraphics lateralSurfaceMaterial = new GridMaterialGraphics();
@@ -641,34 +745,11 @@ public class CesiumDemo {
 
         m_aircraftSensorOne.getExtensions().add(new FieldOfViewGraphicsExtension(sensorFieldOfViewGraphics));
 
-        // Create sensor pointing to the "side".
-        // Position sensor underneath the wing.
-        Point sensorTwoLocationPoint = new PointFixedOffset(m_aircraft.getReferenceFrame(), new Cartesian(-3.0, -8.0, 0.0));
-        Axes sensorAxesTwo = new AxesAlignedConstrained(m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Z), AxisIndicator.THIRD,
-                m_aircraft.getOrientationAxes().getVectorElement(CartesianElement.Y), AxisIndicator.SECOND);
-
-        // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
-        UnitQuaternion rotationTwo = new UnitQuaternion(new ElementaryRotation(AxisIndicator.FIRST, Constants.HalfPi / 2));
-
-        m_aircraftSensorTwo = new Platform();
-        m_aircraftSensorTwo.setLocationPoint(sensorTwoLocationPoint);
-        m_aircraftSensorTwo.setOrientationAxes(new AxesFixedOffset(sensorAxesTwo, rotationTwo));
-
-        // Set the identifier for the sensor in the CZML document. 
-        m_aircraftSensorTwo.getExtensions().add(new IdentifierExtension("AircraftSensorTwo"));
-
-        cesiumPositionExtension = new CesiumPositionExtension();
-        cesiumPositionExtension.setInterpolationAlgorithm(CesiumInterpolationAlgorithm.HERMITE);
-        m_aircraftSensorTwo.getExtensions().add(cesiumPositionExtension);
-
-        // Define the sensor geometry.
-        m_aircraftSensorTwo.getExtensions().add(new FieldOfViewExtension(sensorCone));
-
         // Configure graphical display of the sensor.
         sensorFieldOfViewGraphics = new SensorFieldOfViewGraphics();
 
         // Configure the outline of the projection onto the earth.
-        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(new SolidColorMaterialGraphics(WHITE)));
+        sensorFieldOfViewGraphics.setEllipsoidSurfaceMaterial(toCesiumProperty(new SolidColorMaterialGraphics(RED)));
         sensorFieldOfViewGraphics.setIntersectionWidth(toCesiumProperty(2.0));
 
         lateralSurfaceMaterial = new GridMaterialGraphics();
@@ -678,22 +759,11 @@ public class CesiumDemo {
 
         m_aircraftSensorTwo.getExtensions().add(new FieldOfViewGraphicsExtension(sensorFieldOfViewGraphics));
 
-        // Create an access link between the aircraft and the observer position
-        // on Mount St. Helens, using the same azimuth elevation mask to constrain access.
-
-        m_aircraftAzimuthElevationMaskLink = new LinkInstantaneous(m_maskPlatform, m_aircraft);
-
-        // Set the identifier for the link in the CZML document. 
-        m_aircraftAzimuthElevationMaskLink.getExtensions().add(new IdentifierExtension("AircraftMountStHelensAccess"));
-
-        // Constrain access using the azimuth-elevation mask.
-        AccessQuery query = new AzimuthElevationMaskConstraint(m_aircraftAzimuthElevationMaskLink, LinkRole.TRANSMITTER);
-
         // Configure graphical display of the access link.
         LinkGraphics linkGraphics = new LinkGraphics();
 
         // Show the access link only when access is satisfied.
-        linkGraphics.setShow(new AccessQueryCesiumProperty<>(query, true, false, false));
+        linkGraphics.setShow(new AccessQueryCesiumProperty<>(m_aircraftAzimuthElevationMaskQuery, true, false, false));
         linkGraphics.setMaterial(toCesiumProperty(new SolidColorMaterialGraphics(YELLOW)));
 
         m_aircraftAzimuthElevationMaskLink.getExtensions().add(new LinkGraphicsExtension(linkGraphics));
@@ -711,7 +781,7 @@ public class CesiumDemo {
         CzmlDocument czmlDocument = new CzmlDocument();
 
         czmlDocument.setName("CesiumDemo");
-        czmlDocument.setDescription("Demonstrates CZML generation using STK Components");
+        czmlDocument.setDescription("Demonstrates CZML generation using DME Component Libraries");
         czmlDocument.setRequestedInterval(dataInterval);
 
         // For this demonstration, include whitespace in the CZML
@@ -784,9 +854,10 @@ public class CesiumDemo {
     private Platform m_sensorDome;
     private Platform m_rotatingSensor;
     private Platform m_maskPlatform;
+    private List<Waypoint> m_aircraftWaypoints;
     private Platform m_aircraft;
     private Platform m_aircraftSensorOne;
     private Platform m_aircraftSensorTwo;
     private LinkInstantaneous m_aircraftAzimuthElevationMaskLink;
-
+    private AccessQuery m_aircraftAzimuthElevationMaskQuery;
 }

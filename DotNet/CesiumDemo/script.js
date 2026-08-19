@@ -6,7 +6,7 @@ var baseLayerPickerViewModel = viewer.baseLayerPicker.viewModel;
 var globe = viewer.scene.globe;
 
 // If we can't access the default Cesium ion imagery (because we're offline) then fall back on Natural Earth imagery included in Cesium.
-globe.imageryLayers.get(0).imageryProvider.readyPromise.otherwise(function(error) {
+globe.imageryLayers.get(0).errorEvent.addEventListener(function(error) {
     console.log('Failed to load default imagery, switching to Natural Earth...');
     baseLayerPickerViewModel.selectedImagery = baseLayerPickerViewModel.imageryProviderViewModels.find(function(viewModel) {
         return /Natural Earth/.test(viewModel.name);
@@ -20,7 +20,7 @@ var cesiumWorldTerrainViewModel = baseLayerPickerViewModel.terrainProviderViewMo
 });
 if (cesiumWorldTerrainViewModel !== undefined) {
     baseLayerPickerViewModel.selectedTerrain = cesiumWorldTerrainViewModel;
-    globe.terrainProvider.readyPromise.otherwise(function(error) {
+    globe.terrainProvider.errorEvent.addEventListener(function(error) {
         console.log('Failed to load Cesium World Terrain, switching back to ellipsoid...');
         baseLayerPickerViewModel.selectedTerrain = defaultTerrainViewModel;
     });
@@ -28,8 +28,8 @@ if (cesiumWorldTerrainViewModel !== undefined) {
 
 // Create a simple View Model for the application.
 
-// Note that this demonstration uses Knockout.js to create a user interface 
-// because it is simple to use and included in Cesium already. 
+// Note that this demonstration uses Knockout.js to create a user interface
+// because it is simple to use and included in Cesium already.
 // The capabilities being demonstrated can be used in any application framework.
 
 var viewModel = {

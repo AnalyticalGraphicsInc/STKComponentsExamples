@@ -5,8 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -99,6 +99,7 @@ public class Main extends JFrame {
             scrollPane.setPreferredSize(new Dimension(700, 300));
             textArea.setEditable(false);
             JOptionPane.showMessageDialog(null, scrollPane, "Unhandled Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         });
 
         // startup data configuration
@@ -147,15 +148,15 @@ public class Main extends JFrame {
 
         JulianDate analysisDate = new JulianDate(new GregorianDate(2011, 8, 2, 18, 1, 0));
 
-        ArrayList<TwoLineElementSet> iridium49Tles = TwoLineElementSetHelper.getTles("25108", analysisDate);
+        List<TwoLineElementSet> iridium49Tles = TwoLineElementSetHelper.getTles("25108", analysisDate);
         IridiumSatellite iridium49 = new IridiumSatellite("Iridium 49", iridium49Tles, m_labelFont, m_intendedSignal.getTargetFrequency());
         m_display.getServiceProviders().add(iridium49);
 
-        ArrayList<TwoLineElementSet> iridium58Tles = TwoLineElementSetHelper.getTles("25274", analysisDate);
+        List<TwoLineElementSet> iridium58Tles = TwoLineElementSetHelper.getTles("25274", analysisDate);
         IridiumSatellite iridium58 = new IridiumSatellite("Iridium 58", iridium58Tles, m_labelFont, m_intendedSignal.getTargetFrequency());
         m_display.getServiceProviders().add(iridium58);
 
-        ArrayList<TwoLineElementSet> iridium4Tles = TwoLineElementSetHelper.getTles("24796", analysisDate);
+        List<TwoLineElementSet> iridium4Tles = TwoLineElementSetHelper.getTles("24796", analysisDate);
         IridiumSatellite iridium4 = new IridiumSatellite("Iridium 4", iridium4Tles, m_labelFont, m_intendedSignal.getTargetFrequency());
         m_display.getServiceProviders().add(iridium4);
 
@@ -505,8 +506,7 @@ public class Main extends JFrame {
         // Configure the link graphics to show the line only when access exists,
         // using a AccessQueryGraphicsParameter for the provided query.
         // In our case, this will be when carrier to noise for the downlink is greater than -16db.
-        linkGraphicsExtension.getLinkGraphics().getDisplayParameters()
-                .setDisplay(new AccessQueryGraphicsParameter<>(query, true, false, false));
+        linkGraphicsExtension.getLinkGraphics().getDisplayParameters().setDisplay(new AccessQueryGraphicsParameter<>(query, true, false, false));
     }
 
     /**

@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * NavAnalyst Demo Application
  * 
  * This demo application shows how many of the AGI.Foundation.Navigation methods can be used.
@@ -16,7 +16,7 @@
  * 2 weeks on either side of the almanac's issue date (the information degrades slightly each day, but is 
  * still reliable for 2 weeks). One almanac is delivered with this demo, almanac_sem_week0917_319488.al3. When you start the application, 
  * click "..." next to "SEM Almanac."  Then, find almanac_sem_week0917_319488.al3.
- * Additional almanacs can be found on the AGI FTP site, located here: ftp://ftp.agi.com/pub/Catalog/Almanacs/SEM.
+ * Additional almanacs can be found on the AGI FTP site, located here: https://data.agi.com/pub/Catalog/Almanacs/SEM.
  * Once NavAnalyst starts, you will be able to select an almanac, by clicking the browse button (...) and picking a SEM formatted almanac. 
  * 
  * The demo start time/date is automatically set to March 20, 2017, 00:00 - the day the SampleAlmanac, and other files 

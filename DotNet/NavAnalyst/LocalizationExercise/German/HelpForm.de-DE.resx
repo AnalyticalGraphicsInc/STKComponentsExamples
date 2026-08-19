@@ -121,7 +121,7 @@
     <value>NavAnalyst erlaubt es die Messwertgenauigkeiten (DOP=Dilution of Precision) und Genauigkeitswerte für einen definierten Empfänger grafisch darzustellen und die Ephemeriden aus dem Almanach in eine Ephemeridendatei nach AGI Standard (.e Datei) zu exportieren.
 
 Erstellung eines DOP- oder Genauigkeits-Plots:
-1)	Wählen Sie im ‚Almanach’ Menü einen SEM Almanach aus, der für die gewünschte Analysezeit gültig ist. Ein Almanach für den 21. Juni 2007 ist der Anwendung beigefügt. Andere Almanach-Dateien findet man unter: &lt;ftp://ftp.agi.com/pub/Catalog/Almanacs&gt;
+1)	Wählen Sie im ‚Almanach’ Menü einen SEM Almanach aus, der für die gewünschte Analysezeit gültig ist. Ein Almanach für den 21. Juni 2007 ist der Anwendung beigefügt. Andere Almanach-Dateien findet man unter: &lt;https://data.agi.com/pub/Catalog/Almanacs&gt;
 2)	Setzen Sie die Start- und Stopzeit der Analyse und spezifizieren Sie ob es sich um UTC oder GPS Zeit handelt.
 3)	Setzen Sie den zu verwendenden Zeitschritt für die Analyse. DOP Werte weden zu jedem Zeitschritt berechnet.
 4)	Klicken Sie auf das ‚Empfänger’ Menü und setzen Sie die Empfängerparameter die Ihren Anforderungen genügen, einschließlich der Position des Empfängers.

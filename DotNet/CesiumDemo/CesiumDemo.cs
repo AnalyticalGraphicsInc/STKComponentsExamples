@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Web;
 using AGI.Examples;
 using AGI.Foundation;
@@ -9,6 +10,7 @@ using AGI.Foundation.Access;
 using AGI.Foundation.Access.Constraints;
 using AGI.Foundation.Celestial;
 using AGI.Foundation.Cesium;
+using AGI.Foundation.Cesium.Advanced;
 using AGI.Foundation.Coordinates;
 using AGI.Foundation.Geometry;
 using AGI.Foundation.Geometry.Shapes;
@@ -36,25 +38,28 @@ namespace CesiumDemo
             m_earth = CentralBodiesFacet.GetFromContext().Earth;
 
             // Create all objects for our scenario.
-
-            // Each of these helper methods create some of the objects
-            // which are stored in fields.
             // The work is divided up across methods to make the code easier to follow.
+
+            // First, create the platforms.
             CreateSatellite();
             CreateFacility();
             CreateSatelliteAccessLink();
-            CreateFacilitySensor();
             CreateSensorDome();
             CreateAzimuthElevationMask();
             CreateAircraft();
+
+            // Configure the platforms with extensions to specify how they should be displayed.
+            ConfigureSatelliteGraphics();
+            ConfigureFacilityGraphics();
+            ConfigureSatelliteAccessLinkGraphics();
+            ConfigureFacilitySensorGraphics();
+            ConfigureSensorDomeGraphics();
+            ConfigureAzimuthElevationMaskGraphics();
+            ConfigureAircraftGraphics();
         }
 
         /// <summary>
         /// Create a Platform for the requested satellite using a TLE for position.
-        /// The satellite will be visually represented by a labeled glTF model,
-        /// the satellite's orbit will be shown, and vectors will be drawn for
-        /// the body axes of the satellite, plus a vector indicating the direction
-        /// of the sun.
         /// </summary>
         private void CreateSatellite()
         {
@@ -62,7 +67,7 @@ namespace CesiumDemo
             var tleList = TwoLineElementSetHelper.GetTles(m_satelliteIdentifier, JulianDate.Now);
 
             // Use the epoch of the first TLE, since the TLE may have been loaded from offline data.
-            m_epoch = tleList[0].Epoch;
+            m_epoch = tleList.First().Epoch;
 
             // Propagate the TLE and use that as the satellite's location point.
             var locationPoint = new Sgp4Propagator(tleList).CreatePoint();
@@ -76,15 +81,291 @@ namespace CesiumDemo
 
             // Set the identifier for the satellite in the CZML document.
             m_satellite.Extensions.Add(new IdentifierExtension(m_satelliteIdentifier));
+        }
 
+        /// <summary>
+        /// Create a facility at the location of AGI headquarters, with a sensor.
+        /// The sensor will be oriented to target the satellite.
+        /// </summary>
+        private void CreateFacility()
+        {
+            // Define the location of the facility using cartographic coordinates.
+            var location = new Cartographic(Trig.DegreesToRadians(-75.596872), Trig.DegreesToRadians(40.038969), 100.0);
+            var locationPoint = new PointCartographic(m_earth, location);
+            m_facility = new Platform
+            {
+                Name = "AGI HQ",
+                LocationPoint = locationPoint,
+                // Orient the facility using East-North-Up (ENU) axes.
+                OrientationAxes = new AxesEastNorthUp(m_earth, locationPoint),
+            };
+
+            // Set the identifier for the facility in the CZML document. 
+            m_facility.Extensions.Add(new IdentifierExtension("AGI"));
+
+            m_facilitySensor = new Platform
+            {
+                // Use the same location point as the facility.
+                LocationPoint = m_facility.LocationPoint,
+            };
+
+            // Set the identifier for the facility sensor in the CZML document. 
+            m_facilitySensor.Extensions.Add(new IdentifierExtension("Sensor"));
+
+            // Define the sensor geometry.
+            var fieldOfView = new RectangularPyramid
+            {
+                XHalfAngle = Trig.DegreesToRadians(8.0),
+                YHalfAngle = Trig.DegreesToRadians(4.5),
+            };
+            fieldOfView.SetRadialLimits(0.0, 500000.0);
+            m_facilitySensor.Extensions.Add(new FieldOfViewExtension(fieldOfView));
+        }
+
+        /// <summary>
+        /// Create an access link between AGI HQ and the satellite.
+        /// </summary>
+        private void CreateSatelliteAccessLink()
+        {
+            m_satelliteFacilityLink = new LinkInstantaneous(m_facility, m_satellite);
+
+            // Set the identifier for the link in the CZML document. 
+            m_satelliteFacilityLink.Extensions.Add(new IdentifierExtension("SatelliteFacilityAccess"));
+
+            // Orient the facility sensor to target the link with the satellite.
+            m_facilitySensor.OrientationAxes = new AxesTargetingLink(m_satelliteFacilityLink, LinkRole.Transmitter, new VectorFixed(m_satellite.OrientationAxes, UnitCartesian.UnitZ));
+
+            // Specify how access should be constrained.
+            // In this case, access will only exist when no part of the earth is between AGI HQ and the satellite.
+            m_accessQuery = new CentralBodyObstructionConstraint(m_satelliteFacilityLink, m_earth);
+        }
+
+        /// <summary>
+        /// Create another ground facility with a sensor dome, and a rotating sensor inside the dome.
+        /// </summary>
+        private void CreateSensorDome()
+        {
+            // Define the location of the facility using cartographic coordinates.
+            var locationPoint = new PointCartographic(m_earth, new Cartographic(Trig.DegreesToRadians(-122.3), Trig.DegreesToRadians(46), 456.359));
+
+            m_sensorDome = new Platform
+            {
+                Name = "Sensor Dome",
+                LocationPoint = locationPoint,
+                OrientationAxes = new AxesEastNorthUp(m_earth, locationPoint),
+            };
+
+            // Set the identifier for the facility in the CZML document. 
+            m_sensorDome.Extensions.Add(new IdentifierExtension("SensorDome"));
+
+            // Define the sensor geometry.
+            var domeFieldOfView = new ComplexConic();
+            domeFieldOfView.SetHalfAngles(0.0, Math.PI);
+            domeFieldOfView.SetClockAngles(0.0, Math.PI * 2);
+            domeFieldOfView.SetRadialLimits(0.0, 10000.0);
+
+            m_sensorDome.Extensions.Add(new FieldOfViewExtension(domeFieldOfView));
+
+            // Define a rotating axes.
+            var rotatingAxes = new AxesLinearRate
+            {
+                ReferenceAxes = new AxesEastNorthUp(m_earth, locationPoint),
+                ReferenceEpoch = m_epoch,
+                InitialRotation = UnitQuaternion.Identity,
+                SpinAxis = UnitCartesian.UnitZ,
+                InitialRotationalVelocity = Trig.DegreesToRadians(5.0), // 5 degrees per second
+                RotationalAcceleration = 0.0,
+            };
+
+            // Define a rotation around X.
+            UnitQuaternion quaternion = new UnitQuaternion(new AngleAxisRotation(Math.PI / 3.0, UnitCartesian.UnitX));
+            // Define an angular offset for the rotating axes.
+            var rotatedOffsetAxes = new AxesFixedOffset(rotatingAxes, quaternion);
+
+            m_rotatingSensor = new Platform
+            {
+                Name = "Rotating Sensor",
+                LocationPoint = locationPoint,
+                OrientationAxes = rotatedOffsetAxes,
+            };
+
+            // Set the identifier for the sensor in the CZML document. 
+            m_rotatingSensor.Extensions.Add(new IdentifierExtension("RotatingSensor"));
+
+            // Define the sensor geometry.
+            var rotatingFieldOfView = new RectangularPyramid
+            {
+                XHalfAngle = Trig.DegreesToRadians(30),
+                YHalfAngle = Trig.DegreesToRadians(30),
+            };
+            rotatingFieldOfView.SetRadialLimits(0.0, 10000.0);
+
+            m_rotatingSensor.Extensions.Add(new FieldOfViewExtension(rotatingFieldOfView));
+        }
+
+        /// <summary>
+        /// Create an azimuth-elevation mask.
+        /// </summary>
+        private void CreateAzimuthElevationMask()
+        {
+            // load terrain data for Mount St. Helens.
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.RelativeSearchPath ?? "", "Data");
+            var terrain = new AGIProcessedDataTerrain(Path.Combine(dataPath, @"Terrain\StHelens.pdtt"));
+
+            // Calculate the surface position at the center of the terrain
+            double longitude = (terrain.BoundingExtent.WestLongitude + terrain.BoundingExtent.EastLongitude) / 2.0;
+            double latitude = (terrain.BoundingExtent.NorthLatitude + terrain.BoundingExtent.SouthLatitude) / 2.0;
+            Cartographic observerPosition = new Cartographic(longitude, latitude, terrain.GetHeight(longitude, latitude));
+
+            // Sample using 360 azimuth rays at 0.000275 degrees
+            const int numberOfAzimuthSteps = 360;
+            double stepSize = Trig.DegreesToRadians(0.000275);
+            const double maxSearchAngle = 0.025;
+
+            // Compute the mask.
+            var mask = TerrainAzimuthElevationMask.Compute(terrain, observerPosition, numberOfAzimuthSteps, stepSize, maxSearchAngle);
+
+            var locationPoint = new PointCartographic(m_earth, observerPosition);
+            m_maskPlatform = new Platform
+            {
+                Name = "Azimuth Elevation Mask",
+                LocationPoint = locationPoint,
+                OrientationAxes = new AxesNorthEastDown(m_earth, locationPoint),
+            };
+
+            // Set the identifier for the mask in the CZML document. 
+            m_maskPlatform.Extensions.Add(new IdentifierExtension("Mask"));
+
+            // Attach the computed mask.
+            m_maskPlatform.Extensions.Add(new AzimuthElevationMaskExtension(mask));
+        }
+
+        /// <summary>
+        /// Create an aircraft with two sensors attached to the wings.
+        /// </summary>
+        private void CreateAircraft()
+        {
+            // Define waypoints for the aircraft's path, then use the propagated point as the location point.
+            Cartographic point1 = new Cartographic(Trig.DegreesToRadians(-122.0), Trig.DegreesToRadians(46.3), 4000.0);
+            Cartographic point2 = new Cartographic(Trig.DegreesToRadians(-122.28), Trig.DegreesToRadians(46.25), 4100.0);
+            Cartographic point3 = new Cartographic(Trig.DegreesToRadians(-122.2), Trig.DegreesToRadians(46.1), 6000.0);
+            Cartographic point4 = new Cartographic(Trig.DegreesToRadians(-121.5), Trig.DegreesToRadians(46.0), 7000.0);
+
+            var waypoint1 = new Waypoint(m_epoch, point1, 20.0, 0.0);
+            var waypoint2 = new Waypoint(waypoint1, m_earth.Shape, point2, 20.0);
+            var waypoint3 = new Waypoint(waypoint2, m_earth.Shape, point3, 20.0);
+            var waypoint4 = new Waypoint(waypoint3, m_earth.Shape, point4, 20.0);
+
+            m_aircraftWaypoints = new List<Waypoint> { waypoint1, waypoint2, waypoint3, waypoint4 };
+
+            var waypointPropagator = new WaypointPropagator(m_earth, m_aircraftWaypoints);
+            var locationPoint = waypointPropagator.CreatePoint();
+
+            m_aircraft = new Platform
+            {
+                Name = "Aircraft",
+                LocationPoint = locationPoint,
+                OrientationAxes = new AxesVehicleVelocityLocalHorizontal(m_earth.FixedFrame, locationPoint),
+            };
+
+            // Set the identifier for the aircraft in the CZML document. 
+            m_aircraft.Extensions.Add(new IdentifierExtension("Aircraft"));
+
+            // Hermite interpolation works better for aircraft-like vehicles.
+            m_aircraft.Extensions.Add(new CesiumPositionExtension
+            {
+                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite,
+            });
+
+            // Define a description for the aircraft which will be shown when selected in Cesium.
+            m_aircraft.Extensions.Add(new DescriptionExtension(new Description("Aircraft with two offset sensors")));
+
+            // Create 30 degree simple conic sensor definition
+            var sensorFieldOfView = new ComplexConic();
+            sensorFieldOfView.SetHalfAngles(0.0, Trig.DegreesToRadians(15));
+            sensorFieldOfView.SetClockAngles(Trig.DegreesToRadians(20), Trig.DegreesToRadians(50));
+
+            // Create a sensor pointing "forward".
+            // Position sensor underneath the wing.
+            var sensorOneLocationPoint = new PointFixedOffset(m_aircraft.ReferenceFrame, new Cartesian(-3.0, 8.0, 0.0));
+            var sensorAxesOne = new AxesAlignedConstrained(m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Z), AxisIndicator.Third,
+                                                           m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.X), AxisIndicator.First);
+            // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
+            var rotationOne = new UnitQuaternion(new ElementaryRotation(AxisIndicator.Second, Constants.HalfPi / 4));
+
+            m_aircraftSensorOne = new Platform
+            {
+                LocationPoint = sensorOneLocationPoint,
+                OrientationAxes = new AxesFixedOffset(sensorAxesOne, rotationOne),
+            };
+
+            // Set the identifier for the sensor in the CZML document. 
+            m_aircraftSensorOne.Extensions.Add(new IdentifierExtension("AircraftSensorOne"));
+
+            m_aircraftSensorOne.Extensions.Add(new CesiumPositionExtension
+            {
+                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite,
+            });
+
+            // Define the sensor geometry.
+            m_aircraftSensorOne.Extensions.Add(new FieldOfViewExtension(sensorFieldOfView));
+
+            // Create sensor pointing to the "side".
+            // Position sensor underneath the wing.
+            var sensorTwoLocationPoint = new PointFixedOffset(m_aircraft.ReferenceFrame, new Cartesian(-3.0, -8.0, 0.0));
+            var sensorAxesTwo = new AxesAlignedConstrained(m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Z), AxisIndicator.Third,
+                                                           m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Y), AxisIndicator.Second);
+
+            // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
+            var rotationTwo = new UnitQuaternion(new ElementaryRotation(AxisIndicator.First, Constants.HalfPi / 2));
+
+            m_aircraftSensorTwo = new Platform
+            {
+                LocationPoint = sensorTwoLocationPoint,
+                OrientationAxes = new AxesFixedOffset(sensorAxesTwo, rotationTwo),
+            };
+
+            // Set the identifier for the sensor in the CZML document. 
+            m_aircraftSensorTwo.Extensions.Add(new IdentifierExtension("AircraftSensorTwo"));
+
+            m_aircraftSensorTwo.Extensions.Add(new CesiumPositionExtension
+            {
+                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite,
+            });
+
+            // Define the sensor geometry.
+            m_aircraftSensorTwo.Extensions.Add(new FieldOfViewExtension(sensorFieldOfView));
+
+            // Create an access link between the aircraft and the observer position
+            // on Mount St. Helens, using the same azimuth elevation mask to constrain access.
+
+            m_aircraftAzimuthElevationMaskLink = new LinkInstantaneous(m_maskPlatform, m_aircraft);
+
+            // Set the identifier for the link in the CZML document. 
+            m_aircraftAzimuthElevationMaskLink.Extensions.Add(new IdentifierExtension("AircraftMountStHelensAccess"));
+
+            // Constrain access using the azimuth-elevation mask.
+            m_aircraftAzimuthElevationMaskQuery = new AzimuthElevationMaskConstraint(m_aircraftAzimuthElevationMaskLink, LinkRole.Transmitter);
+        }
+
+        /// <summary>
+        /// Add extensions to specify how the satellite will be shown.
+        /// The satellite will be visually represented by a labeled glTF model,
+        /// the satellite's orbit will be shown, and vectors will be drawn for
+        /// the body axes of the satellite, plus a vector indicating the direction
+        /// of the sun.
+        /// </summary>
+        private void ConfigureSatelliteGraphics()
+        {
             // Configure a glTF model for the satellite.
-            m_satellite.Extensions.Add(new ModelGraphicsExtension(new ModelGraphics
+            var modelGraphics = new ModelGraphics
             {
                 // Link to a binary glTF file.
                 Model = new CesiumResource(GetModelUri("satellite.glb"), CesiumResourceBehavior.LinkTo),
                 // By default, Cesium plays all animations in the model simultaneously, which is not desirable.
                 RunAnimations = false,
-            }));
+            };
+            m_satellite.Extensions.Add(new ModelGraphicsExtension(modelGraphics));
 
             // Configure a label for the satellite.
             m_satellite.Extensions.Add(new LabelGraphicsExtension(new LabelGraphics
@@ -92,7 +373,7 @@ namespace CesiumDemo
                 // Use the name of the satellite as the text of the label.
                 Text = m_satellite.Name,
                 // Change the color of the label after 12 hours. This demonstrates specifying that 
-                // a value varies over time using intervals.
+                // a value can vary over time using intervals.
                 FillColor = new TimeIntervalCollection<Color>
                 {
                     // Green for the first half day...
@@ -108,14 +389,27 @@ namespace CesiumDemo
             // Configure graphical display of the orbital path of the satellite.
             m_satellite.Extensions.Add(new PathGraphicsExtension(new PathGraphics
             {
-                // Configure the visual appearance of the line.
-                Material = new PolylineOutlineMaterialGraphics
+                // Indicate periods of access by coloring the orbital path of the satellite.
+                MaterialMode = CesiumPathMode.Portions,
+                Material = new AccessQueryCesiumProperty<IPolylineMaterialGraphics>
                 {
-                    Color = Color.White,
-                    OutlineWidth = 1.0,
-                    OutlineColor = Color.Black,
+                    Query = m_accessQuery,
+                    // During periods of access, use a green line.
+                    AccessExists = new PolylineOutlineMaterialGraphics
+                    {
+                        Color = Color.Green,
+                        OutlineWidth = 1.0,
+                        OutlineColor = Color.White,
+                    },
+                    // During periods of no access, use a red line.
+                    NoAccess = new PolylineOutlineMaterialGraphics
+                    {
+                        Color = Color.Red,
+                        OutlineWidth = 1.0,
+                        OutlineColor = Color.White,
+                    },
                 },
-                Width = 2.0,
+                Width = 3.0,
                 // Lead and Trail time indicate how much of the path to render.
                 LeadTime = Duration.FromMinutes(44.0).TotalSeconds,
                 TrailTime = Duration.FromMinutes(44.0).TotalSeconds,
@@ -154,7 +448,7 @@ namespace CesiumDemo
             var constrainedAxes = new AxesAlignedConstrained(satelliteYVector, AxisIndicator.First, vectorSatelliteToSun, AxisIndicator.Second);
 
             // Satellite axes are Vehicle Velocity Local Horizontal (VVLH) axes, where X is forward and Z is down,
-            // but Cesium model axes are Z forward, Y up. So, create an axes rotates to the Cesium model axes.
+            // but Cesium model axes are Z forward, Y up. So, create an axes that rotates to the Cesium model axes.
             var offset = new UnitQuaternion(new ElementaryRotation(AxisIndicator.First, -Math.PI / 2)) *
                          new UnitQuaternion(new ElementaryRotation(AxisIndicator.Third, Math.PI / 2));
             var cesiumModelAxes = new AxesFixedOffset(m_satellite.OrientationAxes, offset);
@@ -163,14 +457,14 @@ namespace CesiumDemo
             var solarPanelRotationAxes = new AxesInAxes(constrainedAxes, cesiumModelAxes);
 
             // Add a node transformation to rotate the SolarPanels node of the model.
-            m_satellite.Extensions.GetByType<ModelGraphicsExtension>().ModelGraphics.NodeTransformations = new Dictionary<string, NodeTransformationGraphics>
+            modelGraphics.NodeTransformations = new Dictionary<string, NodeTransformationGraphics>
             {
                 {
                     "SolarPanels", new NodeTransformationGraphics
                     {
-                        Rotation = new AxesCesiumProperty(solarPanelRotationAxes)
+                        Rotation = new AxesCesiumProperty(solarPanelRotationAxes),
                     }
-                }
+                },
             };
         }
 
@@ -199,25 +493,11 @@ namespace CesiumDemo
         }
 
         /// <summary>
-        /// Create a facility at the location of AGI headquarters.
+        /// Add extensions to specify how the facility will be shown.
         /// The facility will be visually represented by a labeled glTF model.
         /// </summary>
-        private void CreateFacility()
+        private void ConfigureFacilityGraphics()
         {
-            // Define the location of the facility using cartographic coordinates.
-            var location = new Cartographic(Trig.DegreesToRadians(-75.596766667), Trig.DegreesToRadians(40.0388333333), 0.0);
-            var locationPoint = new PointCartographic(m_earth, location);
-            m_facility = new Platform
-            {
-                Name = "AGI HQ",
-                LocationPoint = locationPoint,
-                // Orient the facility using East-North-Up (ENU) axes.
-                OrientationAxes = new AxesEastNorthUp(m_earth, locationPoint),
-            };
-
-            // Set the identifier for the facility in the CZML document. 
-            m_facility.Extensions.Add(new IdentifierExtension("AGI"));
-
             // Configure a glTF model for the facility.
             m_facility.Extensions.Add(new ModelGraphicsExtension(new ModelGraphics
             {
@@ -240,19 +520,10 @@ namespace CesiumDemo
         }
 
         /// <summary>
-        /// Create an access link between AGI HQ and the satellite.
+        /// Add extensions to specify how the access link will be shown.
         /// </summary>
-        private void CreateSatelliteAccessLink()
+        private void ConfigureSatelliteAccessLinkGraphics()
         {
-            m_satelliteFacilityLink = new LinkInstantaneous(m_facility, m_satellite);
-
-            // Set the identifier for the link in the CZML document. 
-            m_satelliteFacilityLink.Extensions.Add(new IdentifierExtension("SatelliteFacilityAccess"));
-
-            // Specify how access should be constrained.  In this case, 
-            // access will only exist when no part of the earth is between AGI HQ and the satellite.
-            m_accessQuery = new CentralBodyObstructionConstraint(m_satelliteFacilityLink, m_earth);
-
             // Configure graphical display of the access link.
             m_satelliteFacilityLink.Extensions.Add(new LinkGraphicsExtension(new LinkGraphics
             {
@@ -263,32 +534,10 @@ namespace CesiumDemo
         }
 
         /// <summary>
-        /// Create a sensor, attached to the facility, oriented to target the satellite.
+        /// Add extensions to specify how the facility sensor will be shown.
         /// </summary>
-        private void CreateFacilitySensor()
+        private void ConfigureFacilitySensorGraphics()
         {
-            m_facilitySensor = new Platform
-            {
-                // Use the same location point as the facility.
-                LocationPoint = m_facility.LocationPoint,
-                // Orient the sensor to target the link with the satellite.
-                OrientationAxes = new AxesTargetingLink(m_satelliteFacilityLink, LinkRole.Transmitter, new VectorFixed(m_satellite.OrientationAxes, UnitCartesian.UnitZ))
-            };
-
-            // Set the identifier for the facility in the CZML document. 
-            m_facilitySensor.Extensions.Add(new IdentifierExtension("Sensor"));
-
-            // Define the sensor geometry.
-            m_facilitySensor.Extensions.Add(new FieldOfViewExtension
-            {
-                FieldOfViewVolume = new RectangularPyramid
-                {
-                    XHalfAngle = Trig.DegreesToRadians(8.0),
-                    YHalfAngle = Trig.DegreesToRadians(4.5),
-                    Radius = 500000.0,
-                }
-            });
-
             // Configure graphical display of the sensor.
             m_facilitySensor.Extensions.Add(new FieldOfViewGraphicsExtension(new SensorFieldOfViewGraphics
             {
@@ -304,30 +553,10 @@ namespace CesiumDemo
         }
 
         /// <summary>
-        /// Create another ground facility with a sensor dome, and a rotating sensor inside the dome.
+        /// Add extensions to specify how the sensor dome will be shown.
         /// </summary>
-        private void CreateSensorDome()
+        private void ConfigureSensorDomeGraphics()
         {
-            // Define the location of the facility using cartographic coordinates.
-            var locationPoint = new PointCartographic(m_earth, new Cartographic(Trig.DegreesToRadians(-122.3), Trig.DegreesToRadians(46), 456.359));
-
-            m_sensorDome = new Platform
-            {
-                Name = "Sensor Dome",
-                LocationPoint = locationPoint,
-                OrientationAxes = new AxesEastNorthUp(m_earth, locationPoint),
-            };
-
-            // Set the identifier for the facility in the CZML document. 
-            m_sensorDome.Extensions.Add(new IdentifierExtension("SensorDome"));
-
-            // Define the sensor geometry.
-            var dome = new ComplexConic();
-            dome.SetHalfAngles(0.0, Math.PI);
-            dome.SetClockAngles(0.0, Math.PI * 2);
-            dome.Radius = 10000.0;
-            m_sensorDome.Extensions.Add(new FieldOfViewExtension(dome));
-
             // Configure graphical display of the sensor dome.
             m_sensorDome.Extensions.Add(new FieldOfViewGraphicsExtension(new SensorFieldOfViewGraphics
             {
@@ -336,43 +565,13 @@ namespace CesiumDemo
                     Color = Color.White,
                     CellAlpha = 0.1,
                 },
+                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics
+                {
+                    Color = Color.FromArgb(25, Color.White),
+                },
             }));
 
-            // Define a rotating axes.
-            var rotatingAxes = new AxesLinearRate
-            {
-                ReferenceAxes = new AxesEastNorthUp(m_earth, locationPoint),
-                ReferenceEpoch = m_epoch,
-                InitialRotation = UnitQuaternion.Identity,
-                SpinAxis = UnitCartesian.UnitZ,
-                InitialRotationalVelocity = Trig.DegreesToRadians(5.0), // 5 degrees per second
-                RotationalAcceleration = 0.0,
-            };
-
-            // Define a rotation around X.
-            UnitQuaternion quaternion = new UnitQuaternion(new AngleAxisRotation(Math.PI / 3.0, UnitCartesian.UnitX));
-            // Define an angular offset for the rotating axes.
-            var rotatedOffsetAxes = new AxesFixedOffset(rotatingAxes, quaternion);
-
-            m_rotatingSensor = new Platform
-            {
-                Name = "Rotating Sensor",
-                LocationPoint = locationPoint,
-                OrientationAxes = rotatedOffsetAxes
-            };
-
-            // Set the identifier for the sensor in the CZML document. 
-            m_rotatingSensor.Extensions.Add(new IdentifierExtension("RotatingSensor"));
-
-            // Define the sensor geometry.
-            m_rotatingSensor.Extensions.Add(new FieldOfViewExtension(new RectangularPyramid
-            {
-                XHalfAngle = Trig.DegreesToRadians(30),
-                YHalfAngle = Trig.DegreesToRadians(30),
-                Radius = 10000.0,
-            }));
-
-            // Configure graphical display of the sensor.
+            // Configure graphical display of the rotating sensor.
             m_rotatingSensor.Extensions.Add(new FieldOfViewGraphicsExtension(new SensorFieldOfViewGraphics
             {
                 DomeSurfaceMaterial = new GridMaterialGraphics
@@ -385,48 +584,23 @@ namespace CesiumDemo
                     Color = Color.Pink,
                     CellAlpha = 0.5,
                 },
-                IntersectionColor = Color.White,
+                IntersectionColor = Color.FromArgb(32, Color.White),
                 ShowIntersection = true,
                 ShowEllipsoidHorizonSurfaces = true,
+                ShowEllipsoidSurfaces = true,
+                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics
+                {
+                    Color = Color.Blue,
+                },
             }));
         }
 
         /// <summary>
-        /// Create a fan to visualize an azimuth-elevation mask.
+        /// Add extensions to specify how the azimuth-elevation mask will be shown.
+        /// Use a fan to visualize the mask.
         /// </summary>
-        private void CreateAzimuthElevationMask()
+        private void ConfigureAzimuthElevationMaskGraphics()
         {
-            // load terrain data for Mount St. Helens.
-            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.RelativeSearchPath ?? "", "Data");
-            var terrain = new AGIProcessedDataTerrain(Path.Combine(dataPath, @"Terrain\StHelens.pdtt"));
-
-            // Calculate the surface position at the center of the terrain
-            double longitude = (terrain.BoundingExtent.WestLongitude + terrain.BoundingExtent.EastLongitude) / 2.0;
-            double latitude = (terrain.BoundingExtent.NorthLatitude + terrain.BoundingExtent.SouthLatitude) / 2.0;
-            Cartographic observerPosition = new Cartographic(longitude, latitude, terrain.GetHeight(longitude, latitude));
-
-            // Sample using 360 azimuth rays at 0.000275 degrees
-            const int numberOfAzimuthSteps = 360;
-            double stepSize = Trig.DegreesToRadians(0.000275);
-            const double maxSearchAngle = 0.025;
-
-            // Compute the mask.
-            var mask = TerrainAzimuthElevationMask.Compute(terrain, observerPosition, numberOfAzimuthSteps, stepSize, maxSearchAngle);
-
-            var locationPoint = new PointCartographic(m_earth, observerPosition);
-            m_maskPlatform = new Platform
-            {
-                Name = "Azimuth Elevation Mask",
-                LocationPoint = locationPoint,
-                OrientationAxes = new AxesNorthEastDown(m_earth, locationPoint),
-            };
-
-            // Set the identifier for the mask in the CZML document. 
-            m_maskPlatform.Extensions.Add(new IdentifierExtension("Mask"));
-
-            // Attach the computed mask.
-            m_maskPlatform.Extensions.Add(new AzimuthElevationMaskExtension(mask));
-
             // Define the graphics of the mask.
             m_maskPlatform.Extensions.Add(new AzimuthElevationMaskGraphicsExtension(new AzimuthElevationMaskGraphics
             {
@@ -446,55 +620,27 @@ namespace CesiumDemo
         }
 
         /// <summary>
-        /// Create an aircraft with two sensors.
+        /// Add extensions to specify how the aircraft and attached sensors will be shown.
         /// The aircraft will be visually represented by a labeled glTF model.
         /// </summary>
-        private void CreateAircraft()
+        private void ConfigureAircraftGraphics()
         {
-            // Define waypoints for the aircraft's path and use the propagated point as the location point.
-            Cartographic point1 = new Cartographic(Trig.DegreesToRadians(-122.0), Trig.DegreesToRadians(46.3), 4000.0);
-            Cartographic point2 = new Cartographic(Trig.DegreesToRadians(-122.28), Trig.DegreesToRadians(46.25), 4100.0);
-            Cartographic point3 = new Cartographic(Trig.DegreesToRadians(-122.2), Trig.DegreesToRadians(46.1), 6000.0);
-            Cartographic point4 = new Cartographic(Trig.DegreesToRadians(-121.5), Trig.DegreesToRadians(46.0), 7000.0);
-            Waypoint waypoint1 = new Waypoint(m_epoch, point1, 20.0, 0.0);
-            Waypoint waypoint2 = new Waypoint(waypoint1, m_earth.Shape, point2, 20.0);
-            Waypoint waypoint3 = new Waypoint(waypoint2, m_earth.Shape, point3, 20.0);
-            Waypoint waypoint4 = new Waypoint(waypoint3, m_earth.Shape, point4, 20.0);
-            var waypointPropagator = new WaypointPropagator(m_earth, waypoint1, waypoint2, waypoint3, waypoint4);
-            var locationPoint = waypointPropagator.CreatePoint();
-
-            m_aircraft = new Platform
-            {
-                Name = "Aircraft",
-                LocationPoint = locationPoint,
-                OrientationAxes = new AxesVehicleVelocityLocalHorizontal(m_earth.FixedFrame, locationPoint),
-            };
-
-            // Set the identifier for the aircraft in the CZML document. 
-            m_aircraft.Extensions.Add(new IdentifierExtension("Aircraft"));
-
-            // Hermite interpolation works better for aircraft-like vehicles.
-            m_aircraft.Extensions.Add(new CesiumPositionExtension
-            {
-                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite
-            });
-
             // Configure a glTF model for the aircraft.
             m_aircraft.Extensions.Add(new ModelGraphicsExtension(new ModelGraphics
             {
                 // Link to a binary glTF file.
                 Model = new CesiumResource(GetModelUri("aircraft.glb"), CesiumResourceBehavior.LinkTo),
+                RunAnimations = false,
                 // Flip the model visually to point Z in the correct direction.
                 NodeTransformations = new Dictionary<string, NodeTransformationGraphics>
                 {
                     {
                         "Aircraft", new NodeTransformationGraphics
                         {
-                            Rotation = new UnitQuaternion(new ElementaryRotation(AxisIndicator.Third, Math.PI))
+                            Rotation = new UnitQuaternion(new ElementaryRotation(AxisIndicator.Third, Math.PI)),
                         }
-                    }
+                    },
                 },
-                RunAnimations = false,
             }));
 
             // Show the path of the aircraft.
@@ -521,52 +667,18 @@ namespace CesiumDemo
                     // Green by default...
                     TimeInterval.Infinite.AddData(Color.Green),
                     // Red between first and second waypoints.
-                    new TimeInterval<Color>(waypoint1.Date, waypoint2.Date, Color.Red),
+                    new TimeInterval<Color>(m_aircraftWaypoints[0].Date, m_aircraftWaypoints[1].Date, Color.Red),
                 },
                 // Only show label when camera is far enough from the aircraft,
                 // to avoid visually clashing with the model.
                 DistanceDisplayCondition = new Bounds(1000.0, double.MaxValue),
             }));
 
-            // Define a description for the aircraft which will be shown when selected in Cesium.
-            m_aircraft.Extensions.Add(new DescriptionExtension(new Description("Aircraft with two offset sensors")));
-
-            // Create 30 degree simple conic sensor definition
-            var sensorCone = new ComplexConic();
-            sensorCone.SetHalfAngles(0.0, Trig.DegreesToRadians(15));
-            sensorCone.SetClockAngles(Trig.DegreesToRadians(20), Trig.DegreesToRadians(50));
-            sensorCone.Radius = double.PositiveInfinity;
-
-            // Create a sensor pointing "forward".
-            // Position sensor underneath the wing.
-            var sensorOneLocationPoint = new PointFixedOffset(m_aircraft.ReferenceFrame, new Cartesian(-3.0, 8.0, 0.0));
-            var sensorAxesOne = new AxesAlignedConstrained(m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Z), AxisIndicator.Third,
-                                                           m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.X), AxisIndicator.First);
-            // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
-            var rotationOne = new UnitQuaternion(new ElementaryRotation(AxisIndicator.Second, Constants.HalfPi / 4));
-
-            m_aircraftSensorOne = new Platform
-            {
-                LocationPoint = sensorOneLocationPoint,
-                OrientationAxes = new AxesFixedOffset(sensorAxesOne, rotationOne),
-            };
-
-            // Set the identifier for the sensor in the CZML document. 
-            m_aircraftSensorOne.Extensions.Add(new IdentifierExtension("AircraftSensorOne"));
-
-            m_aircraftSensorOne.Extensions.Add(new CesiumPositionExtension
-            {
-                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite
-            });
-
-            // Define the sensor geometry.
-            m_aircraftSensorOne.Extensions.Add(new FieldOfViewExtension(sensorCone));
-
-            // Configure graphical display of the sensor.
+            // Configure graphical display of the sensors.
             m_aircraftSensorOne.Extensions.Add(new FieldOfViewGraphicsExtension(new SensorFieldOfViewGraphics
             {
                 // Configure the outline of the projection onto the earth.
-                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics(Color.White),
+                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics(Color.Blue),
                 IntersectionWidth = 2.0,
                 LateralSurfaceMaterial = new GridMaterialGraphics
                 {
@@ -574,37 +686,10 @@ namespace CesiumDemo
                 },
             }));
 
-            // Create sensor pointing to the "side".
-            // Position sensor underneath the wing.
-            var sensorTwoLocationPoint = new PointFixedOffset(m_aircraft.ReferenceFrame, new Cartesian(-3.0, -8.0, 0.0));
-            var sensorAxesTwo = new AxesAlignedConstrained(m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Z), AxisIndicator.Third,
-                                                           m_aircraft.OrientationAxes.GetVectorElement(CartesianElement.Y), AxisIndicator.Second);
-
-            // This rotation points the z-axis of the volume back along the x-axis of the ellipsoid.
-            var rotationTwo = new UnitQuaternion(new ElementaryRotation(AxisIndicator.First, Constants.HalfPi / 2));
-
-            m_aircraftSensorTwo = new Platform
-            {
-                LocationPoint = sensorTwoLocationPoint,
-                OrientationAxes = new AxesFixedOffset(sensorAxesTwo, rotationTwo),
-            };
-
-            // Set the identifier for the sensor in the CZML document. 
-            m_aircraftSensorTwo.Extensions.Add(new IdentifierExtension("AircraftSensorTwo"));
-
-            m_aircraftSensorTwo.Extensions.Add(new CesiumPositionExtension
-            {
-                InterpolationAlgorithm = CesiumInterpolationAlgorithm.Hermite
-            });
-
-            // Define the sensor geometry.
-            m_aircraftSensorTwo.Extensions.Add(new FieldOfViewExtension(sensorCone));
-
-            // Configure graphical display of the sensor.
             m_aircraftSensorTwo.Extensions.Add(new FieldOfViewGraphicsExtension(new SensorFieldOfViewGraphics
             {
                 // Configure the outline of the projection onto the earth.
-                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics(Color.White),
+                EllipsoidSurfaceMaterial = new SolidColorMaterialGraphics(Color.Red),
                 IntersectionWidth = 2.0,
                 LateralSurfaceMaterial = new GridMaterialGraphics
                 {
@@ -612,22 +697,11 @@ namespace CesiumDemo
                 },
             }));
 
-            // Create an access link between the aircraft and the observer position
-            // on Mount St. Helens, using the same azimuth elevation mask to constrain access.
-
-            m_aircraftAzimuthElevationMaskLink = new LinkInstantaneous(m_maskPlatform, m_aircraft);
-
-            // Set the identifier for the link in the CZML document. 
-            m_aircraftAzimuthElevationMaskLink.Extensions.Add(new IdentifierExtension("AircraftMountStHelensAccess"));
-
-            // Constrain access using the azimuth-elevation mask.
-            var query = new AzimuthElevationMaskConstraint(m_aircraftAzimuthElevationMaskLink, LinkRole.Transmitter);
-
             // Configure graphical display of the access link.
             m_aircraftAzimuthElevationMaskLink.Extensions.Add(new LinkGraphicsExtension(new LinkGraphics
             {
                 // Show the access link only when access is satisfied.
-                Show = new AccessQueryCesiumProperty<bool>(query, true, false, false),
+                Show = new AccessQueryCesiumProperty<bool>(m_aircraftAzimuthElevationMaskQuery, true, false, false),
                 Material = new SolidColorMaterialGraphics(Color.Yellow),
             }));
         }
@@ -645,7 +719,7 @@ namespace CesiumDemo
             var czmlDocument = new CzmlDocument
             {
                 Name = "CesiumDemo",
-                Description = "Demonstrates CZML generation using STK Components",
+                Description = "Demonstrates CZML generation using DME Component Libraries",
                 RequestedInterval = dataInterval,
                 // For this demonstration, include whitespace in the CZML
                 // to enable easy inspection of the contents. In a real application,
@@ -701,9 +775,11 @@ namespace CesiumDemo
         private Platform m_sensorDome;
         private Platform m_rotatingSensor;
         private Platform m_maskPlatform;
+        private List<Waypoint> m_aircraftWaypoints;
         private Platform m_aircraft;
         private Platform m_aircraftSensorOne;
         private Platform m_aircraftSensorTwo;
         private LinkInstantaneous m_aircraftAzimuthElevationMaskLink;
+        private AccessQuery m_aircraftAzimuthElevationMaskQuery;
     }
 }

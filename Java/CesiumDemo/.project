@@ -16,11 +16,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>common</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Common</locationURI>
-		</link>
-		<link>
 			<name>commonData</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Common/Data</locationURI>
@@ -43,7 +38,7 @@
 	</linkedResources>
 	<filteredResources>
 		<filter>
-			<id>1497896520584</id>
+			<id>1736363994342</id>
 			<name></name>
 			<type>10</type>
 			<matcher>
@@ -52,7 +47,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1497896520587</id>
+			<id>1736363994347</id>
 			<name></name>
 			<type>10</type>
 			<matcher>

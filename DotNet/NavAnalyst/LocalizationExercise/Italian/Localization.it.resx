@@ -145,7 +145,7 @@
     <value>gradi</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>NavAnalyst evidenzia alcune delle nuove feature disponibili utilizzando le funzionalità del Navigation in ambiente della STK Components.</value>
+    <value>NavAnalyst evidenzia alcune delle nuove feature disponibili utilizzando le funzionalità del Navigation in ambiente della DME Component Libraries.</value>
   </data>
   <data name="DOPAnalysis" xml:space="preserve">
     <value>Analisi della DOP</value>

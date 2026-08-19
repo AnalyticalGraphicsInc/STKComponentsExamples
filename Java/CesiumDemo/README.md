@@ -1,14 +1,14 @@
 # Cesium Demo
 
-This application demonstrates a client-server web application which uses STK Components on the server to perform analysis, and [Cesium Analytics SDK](https://help.agi.com/AGIComponents/html/CesiumAnalyticsSdk.htm) on the client (in a web browser) to visualize the results of that analysis using CZML. It also includes demonstrations of each of the specialized graphical features available in Cesium Analytics SDK.
+This application demonstrates a client-server web application which uses DME Component Libraries on a server to perform analysis, and [Cesium ion SDK](https://help.agi.com/AGIComponentsJava/html/CesiumAnalyticsSdk.htm) on the client (in a web browser) to visualize the results of that analysis using CZML. It also includes demonstrations of each of the specialized graphical features available in Cesium ion SDK.
 
-To simplify the application and minimize dependencies, this application uses [Jetty][https://www.eclipse.org/jetty/] and [Spark][https://sparkjava.com/] to create a simple web service. Please note that use of STK Components, and the capabilities being demonstrated, are not specific to these frameworks. STK Components can be integrated with Cesium Analytics SDK using any web application framework.
+To simplify the application and minimize dependencies, this application uses [Jetty][https://www.eclipse.org/jetty/] and [Spark][https://sparkjava.com/] to create a simple web service. Please note that use of DME Component Libraries, and the capabilities being demonstrated, are not specific to these frameworks. DME Component Libraries can be integrated with Cesium ion SDK using any web application framework.
 
 The application also contains a small custom user interface to make it easier to explore the visualizations. This user interface is built using [Knockout.js](https://knockoutjs.com/) because it is already included in Cesium. As above, note that the capabilities being demonstrated can be used in any front-end framework.
 
 ## Features
 
-This example demonstrates visualizing various types of Components objects and analysis, and the advanced graphical capabilities of Cesium Analytics SDK, including:
+This example demonstrates visualizing various types of Components objects and analysis, and the advanced graphical capabilities of Cesium ion SDK, including:
 
 * A satellite propagated from a TLE
 * Access between a satellite and a ground station
@@ -28,9 +28,9 @@ This example demonstrates visualizing various types of Components objects and an
 
 ## Installation
 
-This example requires Cesium Analytics SDK, which is included with an STK Components license, and can be downloaded from [AGI's download site](https://support.agi.com/downloads/).
+This example requires Cesium ion SDK, which is included with an DME Component Libraries license, and can be downloaded from [AGI's download site](https://support.agi.com/downloads/).
 
-Unpack the contents of the `Build\Cesium` directory from the Cesium Analytics SDK package into the `CesiumDemo\web\public\Cesium` directory before building and running the example.
+Copy the Cesium ion SDK zip into the `CesiumDemo\Cesium` directory before building and running the example.
 
 Then, to compile this sample application with Ant:
   * Copy your AGI.Foundation.lic file into the src directory.
